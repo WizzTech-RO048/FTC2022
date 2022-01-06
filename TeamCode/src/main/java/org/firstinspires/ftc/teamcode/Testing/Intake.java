@@ -34,8 +34,8 @@ public class Intake{
 
 	public void setTurbo(boolean value){ turbo = value; }
 
-	void goForward(){ intakeMotor.setPower(0.5); }
-	void goBackward(){ intakeMotor.setPower(-0.5); }
+	void goForward(double speedValue){ intakeMotor.setPower(speedValue); }
+	void goBackward(double speedValue){ intakeMotor.setPower(speedValue); }
 	void stopMoving(){ intakeMotor.setPower(0.0); }
 
 }
