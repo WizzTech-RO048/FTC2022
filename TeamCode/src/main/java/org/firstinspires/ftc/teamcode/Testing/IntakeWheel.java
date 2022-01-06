@@ -1,16 +1,36 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Testing;
 
+// doing the basic imports for the opmode and teleopmode
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-@TeleOp(name = "MainTeleOp")
-public class MainTeleOp extends OpMode{
+// doing the imports for the robotic components
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
+@TeleOp(name = "IntakeWheel")
+public class IntakeWheel extends OpMode{
+	// hardwareMap + telemetry
+	private Telemetry telemetry;
+	private HardwareMap hardwareMap;
+
+	// motor variables
+	private DcMotor intakeMotor;
+	private boolean turbo = false;
+
+	// moving variables
 	private Intake intake;
 	private int speedValue;
 	private double[] speedValues;
 
 	@Override
 	public void init(){
+		// setting up the motor
+		intakeMotor = hardwareMap.dcMotor.get("intakeMotor");
+		intakeMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+
 		intake = new Intake(hardwareMap, telemetry);
 		intake.runWithoutEncoders();
 		speedValue = 0;
@@ -41,4 +61,8 @@ public class MainTeleOp extends OpMode{
 		}
 		telemetry.update();
 	}
+
+	public void runUsingEncoders(){ setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER, intakeMotor); }
+	public void runWithourEncoders(){ setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODERS, intakeMotor); }
+
 }
