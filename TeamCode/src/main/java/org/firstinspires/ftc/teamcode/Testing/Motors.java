@@ -22,18 +22,22 @@ public class Motors{
 	public Motors(final HardwareMap _hardwareMap, final Telemetry _telemetry){
 		hardwareMap = _hardwareMap;
 		telemetry = _telemetry;
-
-		intakeMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 	}
 
 	public void setMotorsMode(DcMotor.RunMode mode, DcMotor ... motors){
 		for(DcMotor motor : motors){
 			motor.setMode(mode);
+			motor.setDirection(DcMotorSimple.Direction.FORWARD);
 		}
 	}
 
 	public void runUsingEncoders(){ setMotorsMode(DcMotor.RunMode.RUN_USING_ENCODER, intakeMotor); }
 	public void runWithoutEncoders(){ setMotorsMode(DcMotor.RunMode.RUN_WITHOUT_ENCODERS, intakeMotor); }
 
-
+	void setTurbo(boolean turboValue){ turbo = tuboValue; }
+	void stopMotors(DcMotor ... motors){
+		for(DcMotor motor : motors){
+			motor.setPower(0.0);
+		}
+	}
 }
