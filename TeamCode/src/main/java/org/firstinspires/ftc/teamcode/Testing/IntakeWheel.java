@@ -1,39 +1,44 @@
+/*
+* This code is written for testing the intake wheel.
+*
+* For this to work, the motor that is connected to the wheel,
+* needs to be connected on the port number 0, on the Control
+* Hub.
+*
+* Controls:
+*     - Y - turn on intake wheel
+*     - B - stop moving
+*
+* */
+
 package org.firstinspires.ftc.teamcode.Testing;
 
 // doing the basic imports for the opmode and teleopmode
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-// doing the imports for the robotic components
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-
-@TeleOp(name = "IntakeWheel")
+@TeleOp(name = "IntakeWheelTesting")
 public class IntakeWheel extends OpMode{
+<<<<<<< HEAD
 	// hardwareMap + telemetry
+=======
+	private Robot robot;
+>>>>>>> 475e411d084e7fbd2c823c5e68aa15abe7a93f8b
 
-	// motor variables
-	private DcMotor intakeMotor;
 	private boolean turbo = false;
-
-	// moving variables
-	private Intake intake;
 	private int speedValue;
-	private double[] speedValues;
 
 	@Override
 	public void init(){
 		// setting up the motor
-		intakeMotor = hardwareMap.dcMotor.get("intakeMotor");
-		intakeMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+		robot = new Robot(hardwareMap, telemetry);
 
-		intake = new Intake(hardwareMap, telemetry);
-		intake.runWithoutEncoders();
-		speedValue = 0;
+		robot.runWithoutEncoders();
+		telemetry.addData("WizzTech Robotics Team", "");
+		telemetry.addData("---------------------------", "");
+		telemetry.addData("testing session for the intake wheel", "");
+		telemetry.addData("---------------------------", "");
 
-		speedValues = new double[] {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
 	}
 
 	public void loop(){
@@ -41,24 +46,14 @@ public class IntakeWheel extends OpMode{
 		double y = gamepad1.left_stick_y;
 
 		if(gamepad1.y){
-			intake.goForward(speedValue);
-		}
-		if(gamepad1.x){
-			intake.goBackward(speedValue);
+			robot.intake();
 		}
 		if(gamepad1.b){
-			intake.stopMoving();
-		}
-		if(gamepad1.dpad_up && speedValue < 10 && speedValue >= 0){
-			speedValue = speedValue + 1;
-			telemetry.addData("speedValue: ", speedValue);
-		}
-		if(gamepad1.dpad_down && speedValue <= 10 && speedValue > 0){
-			speedValue = speedValue - 1;
-			telemetry.addData("speedValue: ", speedValue);
+			robot.stopIntake();
 		}
 		telemetry.update();
 	}
+<<<<<<< HEAD
 
 	public void runUsingEncoders(){ setMotorsMode(DcMotor.RunMode.RUN_USING_ENCODER, intakeMotor); }
 	public void runWithourEncoders(){ setMotorsMode(DcMotor.RunMode.RUN_WITHOUT_ENCODERS, intakeMotor); }
@@ -69,4 +64,6 @@ public class IntakeWheel extends OpMode{
 		}
 	}
 
+=======
+>>>>>>> 475e411d084e7fbd2c823c5e68aa15abe7a93f8b
 }
