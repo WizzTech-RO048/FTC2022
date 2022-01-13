@@ -13,8 +13,6 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 @TeleOp(name = "IntakeWheel")
 public class IntakeWheel extends OpMode{
 	// hardwareMap + telemetry
-	private Telemetry telemetry;
-	private HardwareMap hardwareMap;
 
 	// motor variables
 	private DcMotor intakeMotor;
@@ -62,7 +60,13 @@ public class IntakeWheel extends OpMode{
 		telemetry.update();
 	}
 
-	public void runUsingEncoders(){ setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER, intakeMotor); }
-	public void runWithourEncoders(){ setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODERS, intakeMotor); }
+	public void runUsingEncoders(){ setMotorsMode(DcMotor.RunMode.RUN_USING_ENCODER, intakeMotor); }
+	public void runWithourEncoders(){ setMotorsMode(DcMotor.RunMode.RUN_WITHOUT_ENCODERS, intakeMotor); }
+
+	public void setMotorsMode(DcMotor.RunMode mode, DcMotor ... motors){
+		for(DcMotor motor : motors){
+			motor.setMode(mode);
+		}
+	}
 
 }
