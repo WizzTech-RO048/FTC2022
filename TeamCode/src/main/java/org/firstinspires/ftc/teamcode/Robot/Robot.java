@@ -43,6 +43,8 @@ public class Robot {
 
 	private boolean turbo = false;
 
+	public final Arm arm;
+	private static final int SCISSORS_ARM_FINAL_POS = 12525;
 
 
 	public Robot(final HardwareMap hardwareMap, final Telemetry t, ScheduledExecutorService scheduler){
@@ -74,7 +76,12 @@ public class Robot {
 		wheelsParams.encoderResolution = 384.5;
 		wheels = new Wheels(wheelsParams);
 
-
+		Arm.Parameters armParameters = new Arm.Parameters();
+		armParameters.arm = hardwareMap.dcMotor.get("");
+		armParameters.throwServo = hardwareMap.servo.get("");
+		armParameters.telemetry = telemetry;
+		armParameters.armRaisedPosition = SCISSORS_ARM_FINAL_POS;
+		arm = new Arm(armParameters);
 	}
 
 	private void setMotorMode(DcMotor.RunMode mode, DcMotor... motors) {

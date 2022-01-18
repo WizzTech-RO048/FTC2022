@@ -1,3 +1,16 @@
+/*
+* Controls for the robot :
+* -> gamepad1
+* 	- right joystick -> movement (left, right, forward, backward)
+* 	- left joystick (X axis) -> rotation of the robot
+*
+* -> gamepad2
+* 	- Y - raise arm
+* 	- X - start intake
+* 	- B - stop all the actions (carousel spinning, intake)
+* 	- A - throw the objects
+* */
+
 package org.firstinspires.ftc.teamcode;
 
 // import com.acmerobotics.dashboard.FtcDashboard;
@@ -8,10 +21,12 @@ import org.firstinspires.ftc.teamcode.Robot.*;
 
 import java.util.concurrent.*;
 
-
-@TeleOp(name = "MainTeoOp")
+@TeleOp(name = "MainTeleOp")
 public class MainTeleOp extends OpMode {
 	private Robot robot;
+
+	private boolean isArmRaised = false;
+	private ScheduledFuture<?> lastRotation = null, lastArmRaised = null, lastThrow = null;
 
 	@Override
 	public void init() {
@@ -21,17 +36,18 @@ public class MainTeleOp extends OpMode {
 		msStuckDetectStop = 15000;
 	}
 
-	private double angle = 0;
-	private double lastAngleSet = 0, lastBowlSpeedSet = 0;
-	private boolean isArmRaised = false;
-	private double bowlSpeed = 0;
-	private ScheduledFuture<?> lastRotation = null, lastScissorsArmRaise = null, lastCut = null;
-
-	private double lastFlagsToggle = 0;
-
 	@Override
 	public void stop() {
 		robot.wheels.stop();
+
+		if (lastArmRaised != null) {
+			lastArmRaised.cancel(true);
+		}
+		isArmRaised = false;
+		if (lastThrow != null) {
+			lastThrow.cancel(true);
+		}
+
 		robot.duckServoOff();
 		robot.stopIntake();
 
@@ -43,25 +59,31 @@ public class MainTeleOp extends OpMode {
 		double x = gamepad1.right_stick_x;
 		double r = gamepad1.left_stick_x;
 
-		if (Utils.isDone(lastRotation)) {
-			if (isZero(x) && isZero(y) && isZero(r)) {
+		// movement of the robot
+		if(Utils.isDone(lastRotation)) {
+			if(isZero(x) && isZero(y) && isZero(r)) {
 				robot.wheels.stop();
-			} else {
+			}else {
 				robot.wheels.move(x, y, r);
 			}
 		}
 
-		if(gamepad1.a){
-			robot.duckServoOn();
+		// moving the arm
+		if(Utils.isDone(lastArmRaised) && gamepad2.y){
+			isArmRaised = !isArmRaised;
+			telemetry.addData("Is arm raised ?", isArmRaised);
+			lastArmRaised = robot.arm.moveArm(isArmRaised ? 1 : 0);
 		}
 
-		if(gamepad1.y){
-			robot.intake();
+		// servo throw
+		if(Utils.isDone(lastThrow) && gamepad2.a){
+			lastThrow = robot.arm.throwObjects();
 		}
 
-		if(gamepad1.b){
-			stop();
-		}
+		// other features
+		if(gamepad2.a){ robot.duckServoOn(); }
+		if(gamepad2.y){ robot.intake(); }
+		if(gamepad2.b){ stop(); }
 	}
 
 	private static boolean isZero(double value) {
