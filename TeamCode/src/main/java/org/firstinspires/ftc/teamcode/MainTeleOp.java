@@ -1,56 +1,70 @@
 package org.firstinspires.ftc.teamcode;
 
+// import com.acmerobotics.dashboard.FtcDashboard;
+// import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import org.firstinspires.ftc.teamcode.Teo.*;
+import org.firstinspires.ftc.teamcode.Robot.*;
 
 import java.util.concurrent.*;
 
 
-@TeleOp(name = "MainTeleOp")
+@TeleOp(name = "MainTeoOp")
 public class MainTeleOp extends OpMode {
 	private Robot robot;
-	private Controller controller1;
-	private Controller controller2;
 
 	@Override
-	public void init(){
+	public void init() {
+		// telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 		robot = new Robot(hardwareMap, telemetry, Executors.newScheduledThreadPool(1));
-		robot.runUsingEncoders();
+		// We greatly increase the stop function timeout duration so the scissors' arm has time to lower.
+		msStuckDetectStop = 15000;
+	}
 
-		controller1 = new Controller(gamepad1);
-		controller2 = new Controller(gamepad2);
+	private double angle = 0;
+	private double lastAngleSet = 0, lastBowlSpeedSet = 0;
+	private boolean isArmRaised = false;
+	private double bowlSpeed = 0;
+	private ScheduledFuture<?> lastRotation = null, lastScissorsArmRaise = null, lastCut = null;
+
+	private double lastFlagsToggle = 0;
+
+	@Override
+	public void stop() {
+		robot.wheels.stop();
+		robot.duckServoOff();
+		robot.stopIntake();
+
 	}
 
 	@Override
-	public void stop(){
-		robot.stop();
-	}
-
-	@Override
-	public void loop(){
-		robot.setTurbo(controller1.rightBumber());
-
+	public void loop() {
+		double y = gamepad1.right_stick_y;
 		double x = gamepad1.right_stick_x;
-		double y = gamepad1.right_trigger - gamepad1.left_trigger;
+		double r = gamepad1.left_stick_x;
 
-		telemetry.addData("rightStickX", gamepad1.right_stick_x);
-		telemetry.addData("rightStickY", gamepad1.right_stick_y);
-
-		robot.move(x, y);
-
-		if(gamepad1.y){
-			robot.intake();
-		}
-		if(gamepad1.b){
-			robot.stopIntake();
-			robot.duckServoOff();
+		if (Utils.isDone(lastRotation)) {
+			if (isZero(x) && isZero(y) && isZero(r)) {
+				robot.wheels.stop();
+			} else {
+				robot.wheels.move(x, y, r);
+			}
 		}
 
 		if(gamepad1.a){
 			robot.duckServoOn();
 		}
 
+		if(gamepad1.y){
+			robot.intake();
+		}
+
+		if(gamepad1.b){
+			stop();
+		}
 	}
 
+	private static boolean isZero(double value) {
+		return Utils.inVicinity(value, 0, 0.01);
+	}
 }
