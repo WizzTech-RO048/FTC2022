@@ -8,6 +8,7 @@ package org.firstinspires.ftc.teamcode.Robot;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -19,7 +20,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.*;
 import java.util.stream.*;
 
 public class Robot {
@@ -32,7 +33,8 @@ public class Robot {
 	private final DcMotor rightFront;
 	private final DcMotor rightRear;
 
-	private final Servo duckWheelServo;
+	private final Servo carouselServo;
+	public final Servo throwServo;
 
 	private final Telemetry telemetry;
 
@@ -44,7 +46,8 @@ public class Robot {
 	private boolean turbo = false;
 
 	public final Arm arm;
-	private static final int SCISSORS_ARM_FINAL_POS = 12525;
+	private static final int SCISSORS_ARM_FINAL_POS = 1000;
+	// private static final int SCISSORS_ARM_FINAL_POS = 12525;
 
 
 	public Robot(final HardwareMap hardwareMap, final Telemetry t, ScheduledExecutorService scheduler){
@@ -56,7 +59,8 @@ public class Robot {
 		rightRear = hardwareMap.dcMotor.get("rr");
 	    intakeMotor = hardwareMap.dcMotor.get("intakeMotor");
 
-		duckWheelServo = hardwareMap.servo.get("duckWheel");
+		carouselServo = hardwareMap.servo.get("duckWheel");
+		throwServo = hardwareMap.servo.get("throwServo");
 
 		leftFront.setDirection(DcMotorSimple.Direction.FORWARD);
 	    leftRear.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -77,9 +81,10 @@ public class Robot {
 		wheels = new Wheels(wheelsParams);
 
 		Arm.Parameters armParameters = new Arm.Parameters();
-		armParameters.arm = hardwareMap.dcMotor.get("");
-		armParameters.throwServo = hardwareMap.servo.get("");
+		armParameters.arm = hardwareMap.get(DcMotorEx.class, "armMotor");
+		armParameters.throwServo = hardwareMap.servo.get("throwServo");
 		armParameters.telemetry = telemetry;
+		armParameters.scheduler = scheduler;
 		armParameters.armRaisedPosition = SCISSORS_ARM_FINAL_POS;
 		arm = new Arm(armParameters);
 	}
@@ -98,8 +103,8 @@ public class Robot {
 	public void intake(){ intakeMotor.setPower(1.0); }
 	public void stopIntake(){ intakeMotor.setPower(0.0); }
 
-	public void duckServoOn(){ duckWheelServo.setPosition(1.0); }
-	public void duckServoOff(){ duckWheelServo.setPosition(0.5); }
+	public void duckServoOn(){ carouselServo.setPosition(-1.0); }
+	public void duckServoOff(){ carouselServo.setPosition(0.5); }
 
 	private double getAngularOrientation() { return imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).firstAngle; }
 	public void resetHeading() { headingOffset = getAngularOrientation(); }

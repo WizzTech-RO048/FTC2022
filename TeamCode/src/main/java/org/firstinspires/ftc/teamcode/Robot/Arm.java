@@ -10,9 +10,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import java.util.Objects;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class Arm {
 	private final Telemetry telemetry;
@@ -24,7 +22,7 @@ public class Arm {
 	private final int armRaisedPosition;
 
 	Arm(@NonNull final Parameters parameters){
-		arm = Object.requireNonNull(parameters.arm, "arm is not set");
+		arm = Objects.requireNonNull(parameters.arm, "Scissors arm is not set");
 		arm.setDirection(DcMotorSimple.Direction.FORWARD);
 		arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 		arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -32,7 +30,7 @@ public class Arm {
 		throwServo = Objects.requireNonNull(parameters.throwServo, "throw servo is not set");
 		throwServo.setDirection(Servo.Direction.REVERSE);
 
-		scheduler = Objects.requireNonNull(parameters.scheduler, "Scheduler is not set");
+		scheduler = Objects.requireNonNull(parameters.scheduler, "scheduler is not set");
 		telemetry = Objects.requireNonNull(parameters.telemetry, "Telemetry is not set");
 
 		armRaisedPosition = parameters.armRaisedPosition;
@@ -64,9 +62,35 @@ public class Arm {
 		return lastMove;
 	}
 
+	/*
+	public ScheduledFuture<?> moveUp(double percentage){
+		if(!Utils.isDone(lastMove) && !lastMove.cancel(true)){
+			telemetry.addLine("last move not done!");
+			return null;
+		}
+	}
+
+	public ScheduledFuture<?> moveDown(double percentage){
+		arm.setPower(percentage);
+	}
+	*/
+	public void stopArm(){
+		arm.setPower(0.0);
+	}
+
+	public ScheduledFuture<?> printArmPos(){
+		telemetry.addData("current arm pos", arm.getCurrentPosition());
+
+		lastMove = Utils.poll(scheduler, () -> !arm.isBusy(), () -> arm.setPower(0), 10, TimeUnit.MILLISECONDS);
+
+
+		return lastMove;
+	}
+
 	// ------------------------
 	// - Throw servo functions
 	// ------------------------
+	/*
 	private static final double SERVO_POS = 0.3;
 	public ScheduledFuture<?> throwObjects(){
 		if(!Utils.isDone(lastThrow) && !lastThrow.cancel(true)){
@@ -80,6 +104,7 @@ public class Arm {
 
 		return lastThrow;
 	}
+	*/
 
 	public void cancelCut(){
 		if(Utils.isDone(lastThrow) || !lastThrow.cancel(true)){
@@ -88,7 +113,7 @@ public class Arm {
 	}
 
 	static class Parameters{
-		DcMotor arm;
+		DcMotorEx arm;
 		Servo throwServo;
 		Telemetry telemetry;
 		ScheduledExecutorService scheduler;
