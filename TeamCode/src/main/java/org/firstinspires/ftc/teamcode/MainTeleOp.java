@@ -31,16 +31,12 @@ public class MainTeleOp extends OpMode {
 
 	private boolean isArmRaised = false;
 	private ScheduledFuture<?> lastRotation = null, lastArmRaised = null, lastThrow = null;
-	private int k = 0;
 
 	private double initialThrowServerPos = 0.05;
 
 	@Override
 	public void init() {
-		// telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 		robot = new Robot(hardwareMap, telemetry, Executors.newScheduledThreadPool(1));
-		// We greatly increase the stop function timeout duration so the scissors' arm has time to lower.
-		// msStuckDetectStop = 15000;
 
 		robot.runUsingEncoders();
 
@@ -48,10 +44,11 @@ public class MainTeleOp extends OpMode {
 		controller2 = new Controller(gamepad2);
 
 		robot.throwServo.setPosition(initialThrowServerPos);
-		telemetry.addLine("throw servo disabled");
-
 	}
 
+	// ------------------------
+	// - Stop button 
+	// ------------------------
 	@Override
 	public void stop() {
 		robot.wheels.stop();
@@ -66,7 +63,6 @@ public class MainTeleOp extends OpMode {
 
 		robot.duckServoOff();
 		robot.stopIntake();
-
 	}
 
 	@Override
@@ -74,11 +70,13 @@ public class MainTeleOp extends OpMode {
 		controller1.update();
 		controller2.update();
 
+		// ------------------------
+		// - Robot movement
+		// ------------------------
 		double y = -1 * Math.pow(gamepad1.right_stick_y, 3.0);
 		double x = Math.pow(gamepad1.right_stick_x, 3.0);
 		double r = gamepad1.left_stick_x;
 
-		// movement of the robot
 		if(Utils.isDone(lastRotation)) {
 			if(isZero(x) && isZero(y) && isZero(r)) {
 				robot.wheels.stop();
@@ -86,39 +84,38 @@ public class MainTeleOp extends OpMode {
 				robot.wheels.move(x, y, r);
 			}
 		}
-
-		if(controller1.dpadDownOnce()){
-			robot.throwServo.setPosition(initialThrowServerPos);
-		}
-		if(controller1.dpadUpOnce()){
-
-			robot.throwServo.setPosition(1.0);
-		}
-
+	
+		// ------------------------
+		// - Controlling the arm
+		// ------------------------
 		if(controller1.rightBumberOnce()){
 			isArmRaised = !isArmRaised;
 			telemetry.addData("Is arm raised", isArmRaised);
 			lastArmRaised = robot.arm.moveArm(1);
-		}
+		} 
+		// if(isArmRaised){ robot.arm.BrakeArm(true); }
 
-		if(isArmRaised){
-			robot.arm.BrakeArm(true);
-		}
-		robot.arm.printArmPos();
+		// rotating the throwing servo
+		if(controller1.dpadDownOnce()){ robot.throwServo.setPosition(initialThrowServerPos); }
+		if(controller1.dpadUpOnce()){ robot.throwServo.setPosition(1.0); }
+		
+		// ------------------------
+		// - Other features
+		// ------------------------
+		if(controller1.AOnce()){ robot.duckServoOn(); }
+		if(controller1.YOnce()){ robot.intake(); }
+		if(controller1.BOnce()){ stop(); }
 
-		// other features
-		if(gamepad1.a){ robot.duckServoOn(); }
-		if(gamepad1.y){ robot.intake(); }
-		if(gamepad1.b){ stop(); }
-
+		// ------------------------
+		// - Printing stuff
+		// ------------------------
+		telemetry.addData("is armed raised?", isArmRaised);
 		telemetry.addData("target pos", robot.arm.TargetPos);
 		telemetry.addData("current pos", robot.arm.CurrentPos);
-		telemetry.addData("percentage", (double)(k / 10));
+		robot.arm.printArmPos();
 	}
 
 	private static boolean isZero(double value) {
 		return Utils.inVicinity(value, 0, 0.01);
 	}
-
-
 }

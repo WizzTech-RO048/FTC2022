@@ -22,6 +22,8 @@ public class Arm {
 
 	private final int armRaisedPosition;
 
+	public int TargetPos;
+
 	Arm(@NonNull final Parameters parameters){
 		arm = Objects.requireNonNull(parameters.arm, "Scissors arm is not set");
 		arm.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -35,11 +37,7 @@ public class Arm {
 		telemetry = Objects.requireNonNull(parameters.telemetry, "Telemetry is not set");
 
 		armRaisedPosition = parameters.armRaisedPosition;
-
 	}
-
-	public int TargetPos;
-	public int CurrentPos;
 
 	// ------------------------
 	// - Arm moving functions
@@ -69,45 +67,25 @@ public class Arm {
 		return lastMove;
 	}
 
+	public void stopArm(){ arm.setPower(0.0); }
 
-	public void BrakeArm(boolean shouldUse) {
-		DcMotorEx.ZeroPowerBehavior behavior = shouldUse ? DcMotorEx.ZeroPowerBehavior.BRAKE : DcMotorEx.ZeroPowerBehavior.FLOAT;
-
-		arm.setZeroPowerBehavior(behavior);
-	}
-
-
-	public void stopArm(){
-		arm.setPower(0.0);
-	}
-
+	// printing the current arm position
 	public ScheduledFuture<?> printArmPos(){
 		telemetry.addData("current arm pos", arm.getCurrentPosition());
 		telemetry.addData("target pos", TargetPos);
 		lastMove = Utils.poll(scheduler, () -> !arm.isBusy(), () -> arm.setPower(0), 10, TimeUnit.MILLISECONDS);
-
 		return lastMove;
 	}
 
-	// ------------------------
-	// - Throw servo functions
-	// ------------------------
 	/*
-	private static final double SERVO_POS = 0.3;
-	public ScheduledFuture<?> throwObjects(){
-		if(!Utils.isDone(lastThrow) && !lastThrow.cancel(true)){
-			return null;
-		}
-
-		Servo servo = throwServo;
-		servo.setPosition(SERVO_POS);
-
-		lastThrow = scheduler.schedule(() -> servo.setPosition(0), 500, TimeUnit.MILLISECONDS);
-
-		return lastThrow;
+	public void BrakeArm(boolean shouldUse) {
+		DcMotorEx.ZeroPowerBehavior behavior = shouldUse ? DcMotorEx.ZeroPowerBehavior.BRAKE : DcMotorEx.ZeroPowerBehavior.FLOAT;
+		arm.setZeroPowerBehavior(behavior);
 	}
 	*/
 
+	// cancel the rotation
+	// (Not really sure that we need this)
 	public void cancelCut(){
 		if(Utils.isDone(lastThrow) || !lastThrow.cancel(true)){
 			return ;

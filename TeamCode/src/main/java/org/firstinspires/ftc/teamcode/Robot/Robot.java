@@ -89,6 +89,9 @@ public class Robot {
 		arm = new Arm(armParameters);
 	}
 
+	// ------------------------
+	// - Robot movement
+	// ------------------------
 	private void setMotorMode(DcMotor.RunMode mode, DcMotor... motors) {
 		leftFront.setMode(mode);
 	    leftRear.setMode(mode);
@@ -96,20 +99,16 @@ public class Robot {
 	    rightRear.setMode(mode);
 	}
 
+	// encoders functions
 	public void runUsingEncoders() { setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER); }
 	public void runWithoutEncoders() { setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER); }
 
-	public void intake(){ intakeMotor.setPower(1.0); }
-	public void stopIntake(){ intakeMotor.setPower(0.0); }
-
-	public void duckServoOn(){ carouselServo.setPosition(-1.0); }
-	public void duckServoOff(){ carouselServo.setPosition(0.5); }
-
+	// orientation functions
 	private double getAngularOrientation() { return imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).firstAngle; }
 	public void resetHeading() { headingOffset = getAngularOrientation(); }
 
+	// general movement of the robot
 	public void rotate(double rotation) { setMotors(-rotation, -rotation, rotation, rotation); }
-
 	public void move(double x, double y) {
 		y = -y;
 
@@ -141,16 +140,21 @@ public class Robot {
 		return rf / (isTurbo() ? 1.0 : 2.0) / scale;
 	}
 
-	public boolean isTurbo() {
-		return turbo;
-	}
+	// motor parameters
+	public boolean isTurbo(){ return turbo; }
+	public void setTurbo(boolean value){ turbo = value; }
+	public void stop(){ setMotors(0, 0, 0, 0); }
 
-	public void setTurbo(boolean value) {
-		turbo = value;
-	}
+	// ------------------------
+	// - Controlling the intake
+	// ------------------------
+	public void intake(){ intakeMotor.setPower(1.0); }
+	public void stopIntake(){ intakeMotor.setPower(0.0); }
 
-	public void stop() {
-		setMotors(0, 0, 0, 0);
-	}
-
+	// ------------------------
+	// - Controlling the arm
+	// ------------------------
+	public void duckServoOn(){ carouselServo.setPosition(-1.0); }
+	public void duckServoOff(){ carouselServo.setPosition(0.5); }
+	
 }
