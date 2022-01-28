@@ -72,7 +72,7 @@ public class Arm {
 
 	public void BrakeArm(boolean shouldUse) {
 		DcMotorEx.ZeroPowerBehavior behavior = shouldUse ? DcMotorEx.ZeroPowerBehavior.BRAKE : DcMotorEx.ZeroPowerBehavior.FLOAT;
-	
+
 		arm.setZeroPowerBehavior(behavior);
 	}
 
