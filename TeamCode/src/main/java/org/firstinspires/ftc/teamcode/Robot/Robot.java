@@ -46,8 +46,8 @@ public class Robot {
 	private boolean turbo = false;
 
 	public final Arm arm;
-	private static final int SCISSORS_ARM_FINAL_POS = 1000;
 	// private static final int SCISSORS_ARM_FINAL_POS = 12525;
+	private static final int SCISSORS_ARM_FINAL_POS = 85;
 
 
 	public Robot(final HardwareMap hardwareMap, final Telemetry t, ScheduledExecutorService scheduler){
@@ -94,7 +94,6 @@ public class Robot {
 	    leftRear.setMode(mode);
 	    rightFront.setMode(mode);
 	    rightRear.setMode(mode);
-	    intakeMotor.setMode(mode);
 	}
 
 	public void runUsingEncoders() { setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER); }

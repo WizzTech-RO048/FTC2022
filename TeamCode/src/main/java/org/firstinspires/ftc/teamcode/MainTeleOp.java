@@ -33,14 +33,16 @@ public class MainTeleOp extends OpMode {
 	private ScheduledFuture<?> lastRotation = null, lastArmRaised = null, lastThrow = null;
 	private int k = 0;
 
-	private double initialThrowServerPos = 0.0;
+	private double initialThrowServerPos = 0.05;
 
 	@Override
 	public void init() {
 		// telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 		robot = new Robot(hardwareMap, telemetry, Executors.newScheduledThreadPool(1));
 		// We greatly increase the stop function timeout duration so the scissors' arm has time to lower.
-		msStuckDetectStop = 15000;
+		// msStuckDetectStop = 15000;
+
+		robot.runUsingEncoders();
 
 		controller1 = new Controller(gamepad1);
 		controller2 = new Controller(gamepad2);
@@ -85,39 +87,23 @@ public class MainTeleOp extends OpMode {
 			}
 		}
 
-		// moving the arm
-		if(Utils.isDone(lastArmRaised) && gamepad2.y){
-			isArmRaised = !isArmRaised;
-			telemetry.addData("Is arm raised ?", isArmRaised);
-			lastArmRaised = robot.arm.moveArm(isArmRaised ? 1 : 0);
-		}
-
-		// servo throw
-		// if(Utils.isDone(lastThrow) && gamepad2.a){
-		// 	lastThrow = robot.arm.throwObjects();
-		// }
-
 		if(controller1.dpadDownOnce()){
-			k+=1;
-			// robot.throwServo.setPosition(0.0);
+			robot.throwServo.setPosition(initialThrowServerPos);
 		}
 		if(controller1.dpadUpOnce()){
-			k-=1;
-			// robot.throwServo.setPosition(1.0);
+
+			robot.throwServo.setPosition(1.0);
 		}
 
 		if(controller1.rightBumberOnce()){
-			// the teo code
-			// robot.arm.moveArm(k /10);
-			robot.arm.stopArm();
-			// robot.arm.moveUp(0.5);
+			isArmRaised = !isArmRaised;
+			telemetry.addData("Is arm raised", isArmRaised);
+			lastArmRaised = robot.arm.moveArm(1);
 		}
 
-		if(controller1.leftBumberOnce()){
-			robot.arm.stopArm();
-			// robot.arm.moveDown(0.5);
+		if(isArmRaised){
+			robot.arm.BrakeArm(true);
 		}
-
 		robot.arm.printArmPos();
 
 		// other features
@@ -125,7 +111,8 @@ public class MainTeleOp extends OpMode {
 		if(gamepad1.y){ robot.intake(); }
 		if(gamepad1.b){ stop(); }
 
-
+		telemetry.addData("target pos", robot.arm.TargetPos);
+		telemetry.addData("current pos", robot.arm.CurrentPos);
 		telemetry.addData("percentage", (double)(k / 10));
 	}
 

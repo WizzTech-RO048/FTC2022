@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
+import java.lang.annotation.Target;
 import java.util.Objects;
 import java.util.concurrent.*;
 
@@ -37,6 +38,9 @@ public class Arm {
 
 	}
 
+	public int TargetPos;
+	public int CurrentPos;
+
 	// ------------------------
 	// - Arm moving functions
 	// ------------------------
@@ -49,40 +53,38 @@ public class Arm {
 
 		int targetPosition = (int) Math.floor(Utils.interpolate(0, armRaisedPosition, positionPercentage, 1));
 		int initialPosition = arm.getCurrentPosition();
-		if(targetPosition == initialPosition){
+
+		TargetPos = targetPosition;
+
+		if (armRaisedPosition == initialPosition) {
 			return null;
 		}
 
 		arm.setTargetPosition(targetPosition);
 		arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-		arm.setPower(targetPosition > initialPosition ? 1 : -1);
+		arm.setPower(targetPosition > initialPosition ? 0.2 : -0.2);
 
 		lastMove = Utils.poll(scheduler, () -> !arm.isBusy(), () -> arm.setPower(0), 10, TimeUnit.MILLISECONDS);
 
 		return lastMove;
 	}
 
-	/*
-	public ScheduledFuture<?> moveUp(double percentage){
-		if(!Utils.isDone(lastMove) && !lastMove.cancel(true)){
-			telemetry.addLine("last move not done!");
-			return null;
-		}
+
+	public void BrakeArm(boolean shouldUse) {
+		DcMotorEx.ZeroPowerBehavior behavior = shouldUse ? DcMotorEx.ZeroPowerBehavior.BRAKE : DcMotorEx.ZeroPowerBehavior.FLOAT;
+	
+		arm.setZeroPowerBehavior(behavior);
 	}
 
-	public ScheduledFuture<?> moveDown(double percentage){
-		arm.setPower(percentage);
-	}
-	*/
+
 	public void stopArm(){
 		arm.setPower(0.0);
 	}
 
 	public ScheduledFuture<?> printArmPos(){
 		telemetry.addData("current arm pos", arm.getCurrentPosition());
-
+		telemetry.addData("target pos", TargetPos);
 		lastMove = Utils.poll(scheduler, () -> !arm.isBusy(), () -> arm.setPower(0), 10, TimeUnit.MILLISECONDS);
-
 
 		return lastMove;
 	}
