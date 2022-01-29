@@ -32,7 +32,7 @@ public class MainTeleOp extends OpMode {
 	private boolean isArmRaised = false;
 	private ScheduledFuture<?> lastRotation = null, lastArmRaised = null, lastThrow = null;
 
-	private double initialThrowServerPos = 0.05;
+	private double initialThrowServerPos = 0.1;
 
 	@Override
 	public void init() {
@@ -42,6 +42,8 @@ public class MainTeleOp extends OpMode {
 
 		controller1 = new Controller(gamepad1);
 		controller2 = new Controller(gamepad2);
+
+		robot.arm.isArmRaised = false;
 
 		robot.throwServo.setPosition(initialThrowServerPos);
 	}
@@ -56,7 +58,7 @@ public class MainTeleOp extends OpMode {
 		if (lastArmRaised != null) {
 			lastArmRaised.cancel(true);
 		}
-		isArmRaised = false;
+		isArmRaised = robot.arm.isArmRaised;
 		if (lastThrow != null) {
 			lastThrow.cancel(true);
 		}
@@ -77,6 +79,8 @@ public class MainTeleOp extends OpMode {
 		double x = Math.pow(gamepad1.right_stick_x, 3.0);
 		double r = gamepad1.left_stick_x;
 
+		double rightTrigger = controller1.rightTrigger;
+
 		if(Utils.isDone(lastRotation)) {
 			if(isZero(x) && isZero(y) && isZero(r)) {
 				robot.wheels.stop();
@@ -89,11 +93,19 @@ public class MainTeleOp extends OpMode {
 		// - Controlling the arm
 		// ------------------------
 		if(controller1.rightBumberOnce()){
-			isArmRaised = !isArmRaised;
-			telemetry.addData("Is arm raised", isArmRaised);
+			robot.arm.isArmRaised = !robot.arm.isArmRaised;
 			lastArmRaised = robot.arm.moveArm(1);
-		} 
-		// if(isArmRaised){ robot.arm.BrakeArm(true); }
+		}
+		if(controller1.leftBumberOnce()){
+			robot.arm.isArmRaised = !robot.arm.isArmRaised;
+			lastArmRaised = robot.arm.moveArm(0);
+		}
+
+		// 	robot.arm.moveArm(rightTrigger);
+
+		if(rightTrigger != 0.0){
+			robot.arm.moveArm(rightTrigger);
+		}
 
 		// rotating the throwing servo
 		if(controller1.dpadDownOnce()){ robot.throwServo.setPosition(initialThrowServerPos); }
@@ -109,10 +121,11 @@ public class MainTeleOp extends OpMode {
 		// ------------------------
 		// - Printing stuff
 		// ------------------------
-		telemetry.addData("is armed raised?", isArmRaised);
-		telemetry.addData("target pos", robot.arm.TargetPos);
-		telemetry.addData("current pos", robot.arm.CurrentPos);
+		telemetry.addData("brakes status", robot.arm.brakes);
+		telemetry.addData("is armed raised?", robot.arm.isArmRaised);
 		robot.arm.printArmPos();
+
+		robot.arm.BrakeArm(true);
 	}
 
 	private static boolean isZero(double value) {

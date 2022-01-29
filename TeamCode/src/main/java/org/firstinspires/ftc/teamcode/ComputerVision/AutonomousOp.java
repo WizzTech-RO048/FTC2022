@@ -1,4 +1,7 @@
+/*
 package org.firstinspires.ftc.teamcode.ComputerVision;
+
+import org.firstinspires.ftc.teamcode.Robot.*;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -16,10 +19,6 @@ public class AutonomousOp {
 
     private static final String VUFORIA_KEY = " -- YOUR NEW VUFORIA KEY GOES HERE  --- ";
 
-    private void initVuforia() {
-
-    }
-
     @Override
     private void init(){
 		robot = new Robot(hardwareMap, telemetry, Executors.newScheduledThreadPool(1));
@@ -27,6 +26,7 @@ public class AutonomousOp {
         controller1 = new Controller(gamepad1);
         controller2 = new Controller(gamepad2);
 
+        robot.throwServo.setPosition(initialThrowServerPos);
     }
 
     @Override
@@ -40,3 +40,5 @@ public class AutonomousOp {
     }
 
 }
+
+*/

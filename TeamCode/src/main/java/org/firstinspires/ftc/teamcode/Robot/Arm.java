@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Robot;
 
 import androidx.annotation.NonNull;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -21,8 +22,11 @@ public class Arm {
 	private final Servo throwServo;
 
 	private final int armRaisedPosition;
+	public boolean isArmRaised = false;
 
 	public int TargetPos;
+
+	public boolean brakes = true;
 
 	Arm(@NonNull final Parameters parameters){
 		arm = Objects.requireNonNull(parameters.arm, "Scissors arm is not set");
@@ -44,6 +48,8 @@ public class Arm {
 	// ------------------------
 	private ScheduledFuture<?> lastMove = null, lastThrow = null;
 	public ScheduledFuture<?> moveArm(double positionPercentage){
+		brakes = false;
+		BrakeArm(brakes);
 		if(!Utils.isDone(lastMove) && !lastMove.cancel(true)){
 			telemetry.addLine("last move not done!");
 			return null;
@@ -55,34 +61,45 @@ public class Arm {
 		TargetPos = targetPosition;
 
 		if (armRaisedPosition == initialPosition) {
+			brakes = true;
+			BrakeArm(brakes);
+			isArmRaised = true;
 			return null;
 		}
 
 		arm.setTargetPosition(targetPosition);
 		arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-		arm.setPower(targetPosition > initialPosition ? 0.2 : -0.2);
+		arm.setPower(targetPosition > initialPosition ? 1 : -1);
 
 		lastMove = Utils.poll(scheduler, () -> !arm.isBusy(), () -> arm.setPower(0), 10, TimeUnit.MILLISECONDS);
 
 		return lastMove;
 	}
 
-	public void stopArm(){ arm.setPower(0.0); }
+	public void stopArm(){
+		brakes = true;
+		BrakeArm(brakes);
+		isArmRaised = false;
+		arm.setPower(0.0);
+	}
 
 	// printing the current arm position
 	public ScheduledFuture<?> printArmPos(){
+		if(arm.getCurrentPosition() == 0.0 || arm.getCurrentPosition() < 0){
+			isArmRaised = false;
+			brakes = true;
+		}
 		telemetry.addData("current arm pos", arm.getCurrentPosition());
 		telemetry.addData("target pos", TargetPos);
 		lastMove = Utils.poll(scheduler, () -> !arm.isBusy(), () -> arm.setPower(0), 10, TimeUnit.MILLISECONDS);
 		return lastMove;
 	}
 
-	/*
+
 	public void BrakeArm(boolean shouldUse) {
 		DcMotorEx.ZeroPowerBehavior behavior = shouldUse ? DcMotorEx.ZeroPowerBehavior.BRAKE : DcMotorEx.ZeroPowerBehavior.FLOAT;
 		arm.setZeroPowerBehavior(behavior);
 	}
-	*/
 
 	// cancel the rotation
 	// (Not really sure that we need this)

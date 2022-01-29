@@ -47,8 +47,7 @@ public class Robot {
 
 	public final Arm arm;
 	// private static final int SCISSORS_ARM_FINAL_POS = 12525;
-	private static final int SCISSORS_ARM_FINAL_POS = 85;
-
+	private static final int SCISSORS_ARM_FINAL_POS = 2313;
 
 	public Robot(final HardwareMap hardwareMap, final Telemetry t, ScheduledExecutorService scheduler){
 		telemetry = t;
@@ -148,7 +147,7 @@ public class Robot {
 	// ------------------------
 	// - Controlling the intake
 	// ------------------------
-	public void intake(){ intakeMotor.setPower(1.0); }
+	public void intake(){ intakeMotor.setPower(0.5); }
 	public void stopIntake(){ intakeMotor.setPower(0.0); }
 
 	// ------------------------
