@@ -83,6 +83,10 @@ public class Arm {
 		arm.setPower(0.0);
 	}
 
+	// the predefined position for the autonomous mode
+	public void highLevel(){ moveArm(1.0); }
+	public void midLevel(){ moveArm(0.5); }
+
 	// printing the current arm position
 	public ScheduledFuture<?> printArmPos(){
 		if(arm.getCurrentPosition() == 0.0 || arm.getCurrentPosition() < 0){

@@ -13,8 +13,6 @@
 
 package org.firstinspires.ftc.teamcode;
 
-// import com.acmerobotics.dashboard.FtcDashboard;
-// import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -101,11 +99,12 @@ public class MainTeleOp extends OpMode {
 			lastArmRaised = robot.arm.moveArm(0);
 		}
 
-		// 	robot.arm.moveArm(rightTrigger);
-
 		if(rightTrigger != 0.0){
 			robot.arm.moveArm(rightTrigger);
 		}
+
+		// robot.arm.BrakeArm(true);
+
 
 		// rotating the throwing servo
 		if(controller1.dpadDownOnce()){ robot.throwServo.setPosition(initialThrowServerPos); }
@@ -114,18 +113,16 @@ public class MainTeleOp extends OpMode {
 		// ------------------------
 		// - Other features
 		// ------------------------
-		if(controller1.AOnce()){ robot.duckServoOn(); }
+		if(controller1.XOnce()){ robot.duckServoOn(); }
 		if(controller1.YOnce()){ robot.intake(); }
 		if(controller1.BOnce()){ stop(); }
 
 		// ------------------------
 		// - Printing stuff
 		// ------------------------
-		telemetry.addData("brakes status", robot.arm.brakes);
-		telemetry.addData("is armed raised?", robot.arm.isArmRaised);
+		telemetry.addData("brakes status(on/off)", robot.arm.brakes);
+		telemetry.addData("is arm raised?", robot.arm.isArmRaised);
 		robot.arm.printArmPos();
-
-		robot.arm.BrakeArm(true);
 	}
 
 	private static boolean isZero(double value) {
