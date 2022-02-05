@@ -36,7 +36,7 @@ public class MainTeleOp extends OpMode {
 	public void init() {
 		robot = new Robot(hardwareMap, telemetry, Executors.newScheduledThreadPool(1));
 
-		robot.runUsingEncoders();
+		// robot.runUsingEncoders();
 
 		controller1 = new Controller(gamepad1);
 		controller2 = new Controller(gamepad2);
@@ -99,9 +99,9 @@ public class MainTeleOp extends OpMode {
 			lastArmRaised = robot.arm.moveArm(0);
 		}
 
-		if(rightTrigger != 0.0){
-			robot.arm.moveArm(rightTrigger);
-		}
+		// if(rightTrigger != 0.0){
+		// 	robot.arm.moveArm(rightTrigger);
+	  	// }
 
 		// robot.arm.BrakeArm(true);
 
@@ -114,7 +114,8 @@ public class MainTeleOp extends OpMode {
 		// - Other features
 		// ------------------------
 		if(controller1.XOnce()){ robot.duckServoOn(); }
-		if(controller1.YOnce()){ robot.intake(); }
+		// if(controller1.YOnce()){ robot.intake(); }
+		robot.intake(rightTrigger);
 		if(controller1.BOnce()){ stop(); }
 
 		// ------------------------
@@ -123,6 +124,8 @@ public class MainTeleOp extends OpMode {
 		telemetry.addData("brakes status(on/off)", robot.arm.brakes);
 		telemetry.addData("is arm raised?", robot.arm.isArmRaised);
 		robot.arm.printArmPos();
+
+		robot.sensors.startColorSensor();
 	}
 
 	private static boolean isZero(double value) {

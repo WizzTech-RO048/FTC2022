@@ -7,6 +7,7 @@
 package org.firstinspires.ftc.teamcode.Robot;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -26,8 +27,6 @@ import java.util.stream.*;
 public class Robot {
 	private final DcMotor intakeMotor;
 
-	public final Wheels wheels;
-
 	private final DcMotor leftFront;
 	private final DcMotor leftRear;
 	private final DcMotor rightFront;
@@ -35,6 +34,10 @@ public class Robot {
 
 	private final Servo carouselServo;
 	public final Servo throwServo;
+
+	public final Arm arm;
+	public final Wheels wheels;
+	public final Sensors sensors;
 
 	private final Telemetry telemetry;
 
@@ -45,7 +48,6 @@ public class Robot {
 
 	private boolean turbo = false;
 
-	public final Arm arm;
 	// private static final int SCISSORS_ARM_FINAL_POS = 12525;
 	private static final int SCISSORS_ARM_FINAL_POS = 2313;
 
@@ -86,6 +88,12 @@ public class Robot {
 		armParameters.scheduler = scheduler;
 		armParameters.armRaisedPosition = SCISSORS_ARM_FINAL_POS;
 		arm = new Arm(armParameters);
+
+		Sensors.Parameters sensorsParameters = new Sensors.Parameters();
+		sensorsParameters.colorSensor = hardwareMap.get(ColorSensor.class, "colorSensor");
+		sensorsParameters.scheduler = scheduler;
+		sensorsParameters.telemetry = telemetry;
+		sensors = new Sensors(sensorsParameters);
 	}
 
 	// ------------------------
@@ -147,7 +155,7 @@ public class Robot {
 	// ------------------------
 	// - Controlling the intake
 	// ------------------------
-	public void intake(){ intakeMotor.setPower(0.5); }
+	public void intake(double percentage){ intakeMotor.setPower(percentage); }
 	public void stopIntake(){ intakeMotor.setPower(0.0); }
 
 	// ------------------------
