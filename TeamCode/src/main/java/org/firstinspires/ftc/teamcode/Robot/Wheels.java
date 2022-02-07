@@ -54,9 +54,9 @@ public class Wheels {
 		}
 
 		// FIXME: This is a hack, it's a hardware problem that the left rear wheel spins in reverse.
-		engines.get(1).setDirection(Direction.REVERSE);
 		engines.get(2).setDirection(Direction.REVERSE);
 		engines.get(3).setDirection(Direction.REVERSE);
+		// engines.get(3).setDirection(Direction.REVERSE);
 
 		this.engines = engines;
 

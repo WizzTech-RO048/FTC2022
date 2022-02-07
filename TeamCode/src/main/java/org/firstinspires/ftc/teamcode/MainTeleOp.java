@@ -73,8 +73,8 @@ public class MainTeleOp extends OpMode {
 		// ------------------------
 		// - Robot movement
 		// ------------------------
-		double y = -1 * Math.pow(gamepad1.right_stick_y, 3.0);
-		double x = Math.pow(gamepad1.right_stick_x, 3.0);
+		double y = -gamepad1.left_stick_y;
+		double x = gamepad1.right_stick_x;
 		double r = gamepad1.left_stick_x;
 
 		double rightTrigger = controller1.rightTrigger;

@@ -49,7 +49,7 @@ public class Robot {
 	private boolean turbo = false;
 
 	// private static final int SCISSORS_ARM_FINAL_POS = 12525;
-	private static final int SCISSORS_ARM_FINAL_POS = 2313;
+	private static final int SCISSORS_ARM_FINAL_POS = 2231;
 
 	public Robot(final HardwareMap hardwareMap, final Telemetry t, ScheduledExecutorService scheduler){
 		telemetry = t;
