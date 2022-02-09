@@ -33,7 +33,6 @@ public class Robot {
 	private final DcMotor rightRear;
 
 	private final Servo carouselServo;
-	public final Servo throwServo;
 
 	public final Arm arm;
 	public final Wheels wheels;
@@ -49,7 +48,7 @@ public class Robot {
 	private boolean turbo = false;
 
 	// private static final int SCISSORS_ARM_FINAL_POS = 12525;
-	private static final int SCISSORS_ARM_FINAL_POS = 2231;
+	private static final int SCISSORS_ARM_FINAL_POS = 4675;
 
 	public Robot(final HardwareMap hardwareMap, final Telemetry t, ScheduledExecutorService scheduler){
 		telemetry = t;
@@ -61,7 +60,6 @@ public class Robot {
 	    intakeMotor = hardwareMap.dcMotor.get("intakeMotor");
 
 		carouselServo = hardwareMap.servo.get("duckWheel");
-		throwServo = hardwareMap.servo.get("throwServo");
 
 		leftFront.setDirection(DcMotorSimple.Direction.FORWARD);
 	    leftRear.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -150,7 +148,7 @@ public class Robot {
 	// motor parameters
 	public boolean isTurbo(){ return turbo; }
 	public void setTurbo(boolean value){ turbo = value; }
-	public void stop(){ setMotors(0, 0, 0, 0); }
+	public void stopMotors(){ setMotors(0, 0, 0, 0); }
 
 	// ------------------------
 	// - Controlling the intake
@@ -159,9 +157,12 @@ public class Robot {
 	public void stopIntake(){ intakeMotor.setPower(0.0); }
 
 	// ------------------------
-	// - Controlling the arm
+	// - Carousel servo
 	// ------------------------
 	public void duckServoOn(){ carouselServo.setPosition(-1.0); }
 	public void duckServoOff(){ carouselServo.setPosition(0.5); }
-	
+
+	// ------------------------
+	// - Controlling the arm
+	// ------------------------
 }

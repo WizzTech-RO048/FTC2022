@@ -35,7 +35,7 @@ public class Arm {
 		arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 		throwServo = Objects.requireNonNull(parameters.throwServo, "throw servo is not set");
-		throwServo.setDirection(Servo.Direction.REVERSE);
+		throwServo.setDirection(Servo.Direction.FORWARD);
 
 		scheduler = Objects.requireNonNull(parameters.scheduler, "scheduler is not set");
 		telemetry = Objects.requireNonNull(parameters.telemetry, "Telemetry is not set");
@@ -99,10 +99,17 @@ public class Arm {
 		return lastMove;
 	}
 
-
 	public void BrakeArm(boolean shouldUse) {
 		DcMotorEx.ZeroPowerBehavior behavior = shouldUse ? DcMotorEx.ZeroPowerBehavior.BRAKE : DcMotorEx.ZeroPowerBehavior.FLOAT;
 		arm.setZeroPowerBehavior(behavior);
+	}
+
+	public void raiseArm(double power){
+		if(arm.getCurrentPosition() == TargetPos){
+			stopArm();
+		} else {
+			arm.setPower(power);
+		}
 	}
 
 	// cancel the rotation
@@ -112,6 +119,8 @@ public class Arm {
 			return ;
 		}
 	}
+
+	public void rotateCage(double position){ throwServo.setPosition(position); }
 
 	static class Parameters{
 		DcMotorEx arm;

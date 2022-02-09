@@ -1,14 +1,7 @@
 /*
-* Controls for the robot :
-* -> gamepad1
-* 	- right joystick -> movement (left, right, forward, backward)
-* 	- left joystick (X axis) -> rotation of the robot
+* TODO LIST:
+*  - turbo button
 *
-* -> gamepad2
-* 	- Y - raise arm
-* 	- X - start intake
-* 	- B - stop all the actions (carousel spinning, intake)
-* 	- A - throw the objects
 * */
 
 package org.firstinspires.ftc.teamcode;
@@ -42,8 +35,6 @@ public class MainTeleOp extends OpMode {
 		controller2 = new Controller(gamepad2);
 
 		robot.arm.isArmRaised = false;
-
-		robot.throwServo.setPosition(initialThrowServerPos);
 	}
 
 	// ------------------------
@@ -53,6 +44,7 @@ public class MainTeleOp extends OpMode {
 	public void stop() {
 		robot.wheels.stop();
 		robot.arm.stopArm();
+		robot.stopMotors();
 		if (lastArmRaised != null) {
 			lastArmRaised.cancel(true);
 		}
@@ -73,9 +65,10 @@ public class MainTeleOp extends OpMode {
 		// ------------------------
 		// - Robot movement
 		// ------------------------
-		double y = -gamepad1.left_stick_y;
-		double x = gamepad1.right_stick_x;
-		double r = gamepad1.left_stick_x;
+		double y = -gamepad1.left_stick_y / 2.0;
+		double x = gamepad1.right_stick_x / 2.0;
+		double r = gamepad1.left_stick_x / 2.0;
+		double h = controller2.leftStickY;
 
 		double rightTrigger = controller1.rightTrigger;
 
@@ -86,17 +79,23 @@ public class MainTeleOp extends OpMode {
 				robot.wheels.move(x, y, r);
 			}
 		}
-	
+
 		// ------------------------
 		// - Controlling the arm
 		// ------------------------
-		if(controller1.rightBumberOnce()){
+		if(controller1.AOnce()){
 			robot.arm.isArmRaised = !robot.arm.isArmRaised;
-			lastArmRaised = robot.arm.moveArm(1);
+			lastArmRaised = robot.arm.moveArm(0.0);
 		}
-		if(controller1.leftBumberOnce()){
+
+		if(controller1.BOnce()){
 			robot.arm.isArmRaised = !robot.arm.isArmRaised;
-			lastArmRaised = robot.arm.moveArm(0);
+			lastArmRaised = robot.arm.moveArm(0.5);
+		}
+
+		if(controller1.YOnce()){
+			robot.arm.isArmRaised = !robot.arm.isArmRaised;
+			lastArmRaised = robot.arm.moveArm(1.0);
 		}
 
 		// if(rightTrigger != 0.0){
@@ -107,16 +106,16 @@ public class MainTeleOp extends OpMode {
 
 
 		// rotating the throwing servo
-		if(controller1.dpadDownOnce()){ robot.throwServo.setPosition(initialThrowServerPos); }
-		if(controller1.dpadUpOnce()){ robot.throwServo.setPosition(1.0); }
+		if(controller1.dpadDownOnce()){ robot.arm.rotateCage(1.0); }
+		if(controller1.dpadUpOnce()){ robot.arm.rotateCage(0.1); }
 		
 		// ------------------------
 		// - Other features
 		// ------------------------
-		if(controller1.XOnce()){ robot.duckServoOn(); }
-		// if(controller1.YOnce()){ robot.intake(); }
+		// if(controller1.XOnce()){ robot.duckServoOn(); }
+		if(controller1.XOnce()){ stop(); }
 		robot.intake(rightTrigger);
-		if(controller1.BOnce()){ stop(); }
+		// if(controller1.BOnce()){ stop(); }
 
 		// ------------------------
 		// - Printing stuff
