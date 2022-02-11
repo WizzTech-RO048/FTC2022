@@ -1,8 +1,3 @@
-/*
-* TODO LIST:
-*  - turbo button
-*
-* */
 
 package org.firstinspires.ftc.teamcode;
 
@@ -11,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.Robot.*;
+import org.firstinspires.ftc.teamcode.ComputerVision.*;
 
 import java.util.concurrent.*;
 
@@ -24,6 +20,9 @@ public class MainTeleOp extends OpMode {
 	private ScheduledFuture<?> lastRotation = null, lastArmRaised = null, lastThrow = null;
 
 	private double initialThrowServerPos = 0.1;
+	private int currentArmPosition;
+
+	TensorFlowObjectDetectionWebcam objectDetector;
 
 	@Override
 	public void init() {
@@ -71,6 +70,7 @@ public class MainTeleOp extends OpMode {
 		double h = controller2.leftStickY;
 
 		double rightTrigger = controller1.rightTrigger;
+		double leftTrigger = controller1.leftTrigger;
 
 		if(Utils.isDone(lastRotation)) {
 			if(isZero(x) && isZero(y) && isZero(r)) {
@@ -83,48 +83,62 @@ public class MainTeleOp extends OpMode {
 		// ------------------------
 		// - Controlling the arm
 		// ------------------------
+
+		// TODO: find a good way to control the arm
+		currentArmPosition = robot.arm.currentArmPosition();
+
+		// position 0.0
 		if(controller1.AOnce()){
 			robot.arm.isArmRaised = !robot.arm.isArmRaised;
 			lastArmRaised = robot.arm.moveArm(0.0);
 		}
 
+		// position 0.5
 		if(controller1.BOnce()){
 			robot.arm.isArmRaised = !robot.arm.isArmRaised;
 			lastArmRaised = robot.arm.moveArm(0.5);
 		}
 
+		// position 1.0
 		if(controller1.YOnce()){
 			robot.arm.isArmRaised = !robot.arm.isArmRaised;
 			lastArmRaised = robot.arm.moveArm(1.0);
 		}
 
-		// if(rightTrigger != 0.0){
-		// 	robot.arm.moveArm(rightTrigger);
-	  	// }
-
-		// robot.arm.BrakeArm(true);
-
-
 		// rotating the throwing servo
-		if(controller1.dpadDownOnce()){ robot.arm.rotateCage(1.0); }
-		if(controller1.dpadUpOnce()){ robot.arm.rotateCage(0.1); }
-		
+		if(controller1.dpadUpOnce() && currentArmPosition > 500){ robot.arm.rotateCage(1.0); }
+		if(controller1.dpadDownOnce()){ robot.arm.rotateCage(0.1); }
+
+		// ------------------------
+		// - Intake system
+		// ------------------------
+
+		if(leftTrigger == 0.0){ robot.intake(rightTrigger); }
+		if(rightTrigger == 0.0){ robot.intake(-leftTrigger); }
+
 		// ------------------------
 		// - Other features
 		// ------------------------
-		// if(controller1.XOnce()){ robot.duckServoOn(); }
+		// emergency stop button
 		if(controller1.XOnce()){ stop(); }
-		robot.intake(rightTrigger);
-		// if(controller1.BOnce()){ stop(); }
+
+		// the duck servo
+		if(controller1.dpadRightOnce()){ robot.duckServoOn(); }
+		if(controller1.dpadLeftOnce()){ robot.duckServoOff(); }
 
 		// ------------------------
 		// - Printing stuff
 		// ------------------------
 		telemetry.addData("brakes status(on/off)", robot.arm.brakes);
 		telemetry.addData("is arm raised?", robot.arm.isArmRaised);
-		robot.arm.printArmPos();
-
+		telemetry.addData("current arm position", currentArmPosition);
+		robot.wheels.returnMotorsValues();
 		robot.sensors.startColorSensor();
+
+		// ------------------------
+		// - Computer vision
+		// ------------------------
+		// objectDetector.initTfod();
 	}
 
 	private static boolean isZero(double value) {

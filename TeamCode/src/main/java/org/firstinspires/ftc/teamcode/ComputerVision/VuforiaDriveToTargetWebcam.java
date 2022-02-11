@@ -41,7 +41,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 
 @TeleOp(name="Drive To Target", group = "Concept")
 @Disabled
-public class ConceptVuforiaDriveToTargetWebcam extends LinearOpMode
+public class VuforiaDriveToTargetWebcam extends LinearOpMode
 {
 	// Adjust these numbers to suit your robot.
 	final double DESIRED_DISTANCE = 8.0; //  this is how close the camera should get to the target (inches)

@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.robotcontroller.external.ComputerVision;
+package org.firstinspires.ftc.teamcode.ComputerVision;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -49,9 +49,9 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
  * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
  * is explained below.
  */
-@TeleOp(name = "Concept: TensorFlow Object Detection Webcam", group = "Concept")
+@TeleOp(name = "TensorFlow Object Detection Webcam", group = "Concept")
 // @Disabled
-public class ConceptTensorFlowObjectDetectionWebcam extends LinearOpMode {
+public class TensorFlowObjectDetectionWebcam extends LinearOpMode {
 	/* Note: This sample uses the all-objects Tensor Flow model (FreightFrenzy_BCDM.tflite), which contains
 	 * the following 4 detectable objects
 	 *  0: Ball,
@@ -117,7 +117,7 @@ public class ConceptTensorFlowObjectDetectionWebcam extends LinearOpMode {
 			// to artificially zoom in to the center of image.  For best results, the "aspectRatio" argument
 			// should be set to the value of the images used to create the TensorFlow Object Detection model
 			// (typically 16/9).
-			tfod.setZoom(2.5, 16.0/9.0);
+			tfod.setZoom(1.0, 16.0/9.0);
 		}
 
 		/** Wait for the game to begin */
@@ -125,6 +125,7 @@ public class ConceptTensorFlowObjectDetectionWebcam extends LinearOpMode {
 		telemetry.update();
 		waitForStart();
 
+		// TODO: implement the posibilty of movement during the detection
 		if (opModeIsActive()) {
 			while (opModeIsActive()) {
 				if (tfod != null) {
@@ -134,8 +135,27 @@ public class ConceptTensorFlowObjectDetectionWebcam extends LinearOpMode {
 					if (updatedRecognitions != null) {
 						telemetry.addData("# Object Detected", updatedRecognitions.size());
 						// step through the list of recognitions and display boundary info.
-						int i = 0;
+						int i = 0, numMarkers = 0;
 						for (Recognition recognition : updatedRecognitions) {
+							if(recognition.getLabel() == "Marker"){
+								numMarkers++;
+							}
+							// TODO: find a way to sort the markers
+							/**
+							 * A very easily way would be to sort them using their pixels
+							 * locations.
+							 *
+							 * All the data corelated to a marker should be parsed through
+							 * a struct
+							 *
+							 * Then, we can sort all the markers.
+							 *
+							 * WARNING: we can try to classify the marker by using their distance
+							 * corelated to the screen. (E.G: if a marker is in the westest point of
+							 * the screen, then probably it wil be the first marker).*/
+
+							// TODO: learn the way the markers are numerotated
+
 							telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
 							telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
 									recognition.getLeft(), recognition.getTop());
@@ -175,7 +195,8 @@ public class ConceptTensorFlowObjectDetectionWebcam extends LinearOpMode {
 		int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
 				"tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
 		TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-		tfodParameters.minResultConfidence = 0.8f;
+		// TODO: to a little bit of research referring to the best threshold fof the ML model.
+		tfodParameters.minResultConfidence = 0.5f;
 		tfodParameters.isModelTensorFlow2 = true;
 		tfodParameters.inputSize = 320;
 		tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);

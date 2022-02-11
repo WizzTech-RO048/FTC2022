@@ -48,7 +48,7 @@ public class Robot {
 	private boolean turbo = false;
 
 	// private static final int SCISSORS_ARM_FINAL_POS = 12525;
-	private static final int SCISSORS_ARM_FINAL_POS = 4675;
+	private static final int SCISSORS_ARM_FINAL_POS = 4300;
 
 	public Robot(final HardwareMap hardwareMap, final Telemetry t, ScheduledExecutorService scheduler){
 		telemetry = t;
@@ -104,6 +104,8 @@ public class Robot {
 	    rightRear.setMode(mode);
 	}
 
+	// TODO: turbo button
+
 	// encoders functions
 	public void runUsingEncoders() { setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER); }
 	public void runWithoutEncoders() { setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER); }
@@ -130,6 +132,13 @@ public class Robot {
 
 		setMotors(factorSin, factorCos, factorCos, factorSin);
 	}
+
+	// TODO: write the functions for the robot to move easily and carefully
+	// autonomous movement
+	public void forward(){ move(0.0, 1.0); }
+	public void backward(){ move(0.0, -1.0); }
+	public void left(){ move(-1.0, 0.0); }
+	public void right(){ move(1.0, 0.0); }
 
 	private void setMotors(double lf, double lr, double rf, double rr) {
 		final double scale = Stream.of(1.0, lf, lr, rf, rr).mapToDouble(Math::abs).max().getAsDouble();

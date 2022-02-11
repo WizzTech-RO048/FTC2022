@@ -30,7 +30,7 @@ public class Arm {
 
 	Arm(@NonNull final Parameters parameters){
 		arm = Objects.requireNonNull(parameters.arm, "Scissors arm is not set");
-		arm.setDirection(DcMotorSimple.Direction.FORWARD);
+		arm.setDirection(DcMotorSimple.Direction.REVERSE);
 		arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 		arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
@@ -83,12 +83,9 @@ public class Arm {
 		arm.setPower(0.0);
 	}
 
-	// the predefined position for the autonomous mode
-	public void highLevel(){ moveArm(1.0); }
-	public void midLevel(){ moveArm(0.5); }
+	public int currentArmPosition(){ return arm.getCurrentPosition(); }
 
-	// printing the current arm position
-	public ScheduledFuture<?> printArmPos(){
+	/* public ScheduledFuture<?> printArmPos(){
 		if(arm.getCurrentPosition() == 0.0 || arm.getCurrentPosition() < 0){
 			isArmRaised = false;
 			brakes = true;
@@ -97,30 +94,22 @@ public class Arm {
 		telemetry.addData("target pos", TargetPos);
 		lastMove = Utils.poll(scheduler, () -> !arm.isBusy(), () -> arm.setPower(0), 10, TimeUnit.MILLISECONDS);
 		return lastMove;
-	}
+	} */
 
 	public void BrakeArm(boolean shouldUse) {
 		DcMotorEx.ZeroPowerBehavior behavior = shouldUse ? DcMotorEx.ZeroPowerBehavior.BRAKE : DcMotorEx.ZeroPowerBehavior.FLOAT;
 		arm.setZeroPowerBehavior(behavior);
 	}
 
-	public void raiseArm(double power){
-		if(arm.getCurrentPosition() == TargetPos){
-			stopArm();
-		} else {
-			arm.setPower(power);
-		}
-	}
-
-	// cancel the rotation
-	// (Not really sure that we need this)
-	public void cancelCut(){
-		if(Utils.isDone(lastThrow) || !lastThrow.cancel(true)){
-			return ;
-		}
-	}
-
+	// rotating the cage
 	public void rotateCage(double position){ throwServo.setPosition(position); }
+
+	// ------------------------
+	// - Predefined arm positions
+	// ------------------------
+	public void level1(){ moveArm(0.9); }
+	public void level2(){ moveArm(0.4); }
+	public void level3(){ moveArm(0.2); }
 
 	static class Parameters{
 		DcMotorEx arm;

@@ -53,10 +53,11 @@ public class Wheels {
 			engines.add(getEngine(map, name));
 		}
 
-		// FIXME: This is a hack, it's a hardware problem that the left rear wheel spins in reverse.
-		engines.get(2).setDirection(Direction.REVERSE);
-		// engines.get(3).setDirection(Direction.REVERSE);
-		// engines.get(3).setDirection(Direction.REVERSE);
+		// FIXME: right-left movement of the robot
+		engines.get(0).setDirection(Direction.REVERSE);
+		engines.get(1).setDirection(Direction.REVERSE);
+		// engines.get(2).setDirection(Direction.REVERSE);
+		engines.get(3).setDirection(Direction.REVERSE); // rr
 
 		this.engines = engines;
 
@@ -77,6 +78,11 @@ public class Wheels {
 			fn.apply(engine, index);
 			index++;
 		}
+	}
+
+	// TODO: implement a feature to track robot's movement disntance
+	public void returnMotorsValues(){
+		forEachEngine((engine, _i) -> telemetry.addData(String.format("%s", _i), engine.getCurrentPosition()));
 	}
 
 	public void useEncoders(boolean shouldUse) {

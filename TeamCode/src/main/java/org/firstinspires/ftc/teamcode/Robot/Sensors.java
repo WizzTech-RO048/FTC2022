@@ -35,6 +35,9 @@ public class Sensors {
 		telemetry.addData("B", colorSensor.blue());
 	}
 
+	// TODO: scan if an object is on the robot
+
+
 	static class Parameters{
 		ColorSensor colorSensor;
 		Telemetry telemetry;
