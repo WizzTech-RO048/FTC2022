@@ -8,6 +8,7 @@ public class Controller {
 	private int dpadUp, dpadDown, dpadRight, dpadLeft;
 	private int x, y, a, b;
 	private int leftBumber, rightBumber;
+	private int start;
 
 	public double leftStickX, leftStickY;
 	public double rightStickX, rightStickY;
@@ -22,6 +23,7 @@ public class Controller {
 		if(gamepad.y){ y++; } else{ y = 0; }
 		if(gamepad.a){ a++; } else{ a = 0; }
 		if(gamepad.b){ b++; } else{ b = 0; }
+		if(gamepad.start){ start++; } else{ start = 0; }
 
 		if(gamepad.dpad_up){ dpadUp++; } else{ dpadUp = 0; }
 		if(gamepad.dpad_down){ dpadDown++; } else{ dpadDown = 0; }
@@ -43,6 +45,7 @@ public class Controller {
 	public boolean dpadDown(){ return dpadDown > 0; }
 	public boolean dpadRight(){ return dpadRight > 0; }
 	public boolean dpadLeft(){ return dpadLeft > 0; }
+	public boolean start(){ return start > 0; }
 
 	public boolean X(){ return x > 0; }
 	public boolean Y(){ return y > 0; }
@@ -61,6 +64,7 @@ public class Controller {
 	public boolean YOnce(){ return y == 1; }
 	public boolean AOnce(){ return a == 1; }
 	public boolean BOnce(){ return b == 1; }
+	public boolean startOnce(){ return start == 1; }
 
 	public boolean leftBumberOnce(){ return leftBumber == 1; }
 	public boolean rightBumberOnce(){ return rightBumber == 1; }

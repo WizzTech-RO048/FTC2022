@@ -104,8 +104,6 @@ public class Robot {
 	    rightRear.setMode(mode);
 	}
 
-	// TODO: turbo button
-
 	// encoders functions
 	public void runUsingEncoders() { setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER); }
 	public void runWithoutEncoders() { setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER); }
@@ -135,7 +133,7 @@ public class Robot {
 
 	// TODO: write the functions for the robot to move easily and carefully
 	// autonomous movement
-	public void forward(){ move(0.0, 1.0); }
+	public void forward(){ wheels.move(0.0, 0.0, 1.0); }
 	public void backward(){ move(0.0, -1.0); }
 	public void left(){ move(-1.0, 0.0); }
 	public void right(){ move(1.0, 0.0); }
@@ -170,8 +168,4 @@ public class Robot {
 	// ------------------------
 	public void duckServoOn(){ carouselServo.setPosition(-1.0); }
 	public void duckServoOff(){ carouselServo.setPosition(0.5); }
-
-	// ------------------------
-	// - Controlling the arm
-	// ------------------------
 }

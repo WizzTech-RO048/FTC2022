@@ -68,7 +68,7 @@ public class Arm {
 		}
 
 		arm.setTargetPosition(targetPosition);
-		arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+		arm. setMode(DcMotor.RunMode.RUN_TO_POSITION);
 		arm.setPower(targetPosition > initialPosition ? 1 : -1);
 
 		lastMove = Utils.poll(scheduler, () -> !arm.isBusy(), () -> arm.setPower(0), 10, TimeUnit.MILLISECONDS);
@@ -104,12 +104,7 @@ public class Arm {
 	// rotating the cage
 	public void rotateCage(double position){ throwServo.setPosition(position); }
 
-	// ------------------------
-	// - Predefined arm positions
-	// ------------------------
-	public void level1(){ moveArm(0.9); }
-	public void level2(){ moveArm(0.4); }
-	public void level3(){ moveArm(0.2); }
+
 
 	static class Parameters{
 		DcMotorEx arm;

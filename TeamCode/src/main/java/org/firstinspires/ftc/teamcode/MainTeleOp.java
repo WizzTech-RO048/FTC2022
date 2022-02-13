@@ -17,10 +17,15 @@ public class MainTeleOp extends OpMode {
 	private Controller controller2;
 
 	private boolean isArmRaised = false;
+	private boolean servoRotated = false;
 	private ScheduledFuture<?> lastRotation = null, lastArmRaised = null, lastThrow = null;
 
 	private double initialThrowServerPos = 0.1;
 	private int currentArmPosition;
+	private double targetPosition;
+
+	private int rbPressed = 0;
+	private int dpadLeftPressed = 0;
 
 	TensorFlowObjectDetectionWebcam objectDetector;
 
@@ -33,6 +38,9 @@ public class MainTeleOp extends OpMode {
 		controller1 = new Controller(gamepad1);
 		controller2 = new Controller(gamepad2);
 
+		robot.arm.rotateCage(0.0);
+
+		servoRotated = false;
 		robot.arm.isArmRaised = false;
 	}
 
@@ -64,10 +72,9 @@ public class MainTeleOp extends OpMode {
 		// ------------------------
 		// - Robot movement
 		// ------------------------
-		double y = -gamepad1.left_stick_y / 2.0;
-		double x = gamepad1.right_stick_x / 2.0;
-		double r = gamepad1.left_stick_x / 2.0;
-		double h = controller2.leftStickY;
+		double y = gamepad1.left_stick_x;
+		double x = -gamepad1.right_stick_x;
+		double r = -gamepad1.left_stick_y;
 
 		double rightTrigger = controller1.rightTrigger;
 		double leftTrigger = controller1.leftTrigger;
@@ -83,48 +90,64 @@ public class MainTeleOp extends OpMode {
 		// ------------------------
 		// - Controlling the arm
 		// ------------------------
-
-		// TODO: find a good way to control the arm
 		currentArmPosition = robot.arm.currentArmPosition();
 
-		// position 0.0
-		if(controller1.AOnce()){
-			robot.arm.isArmRaised = !robot.arm.isArmRaised;
-			lastArmRaised = robot.arm.moveArm(0.0);
+		if(controller1.AOnce()){ targetPosition = 0.0; }
+		if(controller1.BOnce()){ targetPosition = 0.4; }
+		if(controller1.YOnce()){ targetPosition = 0.9; }
+		if(controller1.XOnce()){ targetPosition = 1.0; }
+
+		if(controller1.dpadUpOnce() && targetPosition <= 1.0){
+			targetPosition += 0.1;
+		}
+		if(controller1.dpadDownOnce() && targetPosition >= 0.0){
+			targetPosition -= 0.1;
 		}
 
-		// position 0.5
-		if(controller1.BOnce()){
-			robot.arm.isArmRaised = !robot.arm.isArmRaised;
-			lastArmRaised = robot.arm.moveArm(0.5);
-		}
+		if(targetPosition == 0.0){ robot.arm.isArmRaised = false; } else{ robot.arm.isArmRaised = true; }
 
-		// position 1.0
-		if(controller1.YOnce()){
-			robot.arm.isArmRaised = !robot.arm.isArmRaised;
-			lastArmRaised = robot.arm.moveArm(1.0);
-		}
+		lastArmRaised = robot.arm.moveArm(targetPosition);
+
 
 		// rotating the throwing servo
-		if(controller1.dpadUpOnce() && currentArmPosition > 500){ robot.arm.rotateCage(1.0); }
-		if(controller1.dpadDownOnce()){ robot.arm.rotateCage(0.1); }
+		// TODO: one press rotation
+		if(controller1.rightBumberOnce() && targetPosition >= 0.4){
+			rbPressed++;
+			if(rbPressed % 2 == 1){
+				servoRotated = true;
+				robot.arm.rotateCage(1.0);
+			} else{
+				servoRotated = false;
+				robot.arm.rotateCage(0.1);
+			}
+		}
+
+
+		if(currentArmPosition < 500 && servoRotated == true){
+			servoRotated = false;
+			robot.arm.rotateCage(0.0);
+		}
 
 		// ------------------------
 		// - Intake system
 		// ------------------------
-
 		if(leftTrigger == 0.0){ robot.intake(rightTrigger); }
 		if(rightTrigger == 0.0){ robot.intake(-leftTrigger); }
 
 		// ------------------------
 		// - Other features
 		// ------------------------
-		// emergency stop button
-		if(controller1.XOnce()){ stop(); }
+		if(controller1.startOnce()){ stop(); } // emergency stop button
 
 		// the duck servo
-		if(controller1.dpadRightOnce()){ robot.duckServoOn(); }
-		if(controller1.dpadLeftOnce()){ robot.duckServoOff(); }
+		if(controller1.dpadLeftOnce()){
+			dpadLeftPressed++;
+			if(dpadLeftPressed % 2 == 0){
+				robot.duckServoOn();
+			} else{
+				robot.duckServoOff();
+			}
+		}
 
 		// ------------------------
 		// - Printing stuff
@@ -132,8 +155,8 @@ public class MainTeleOp extends OpMode {
 		telemetry.addData("brakes status(on/off)", robot.arm.brakes);
 		telemetry.addData("is arm raised?", robot.arm.isArmRaised);
 		telemetry.addData("current arm position", currentArmPosition);
-		robot.wheels.returnMotorsValues();
-		robot.sensors.startColorSensor();
+		telemetry.addData("meanValue", robot.sensors.meanValue());
+		telemetry.addData("motors value", robot.wheels.returnMotorsValues());
 
 		// ------------------------
 		// - Computer vision

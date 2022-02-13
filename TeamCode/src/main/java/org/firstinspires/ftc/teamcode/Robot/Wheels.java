@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Objects;
 
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
 import static java.util.concurrent.TimeUnit.*;
@@ -54,10 +55,27 @@ public class Wheels {
 		}
 
 		// FIXME: right-left movement of the robot
-		engines.get(0).setDirection(Direction.REVERSE);
-		engines.get(1).setDirection(Direction.REVERSE);
-		// engines.get(2).setDirection(Direction.REVERSE);
-		engines.get(3).setDirection(Direction.REVERSE); // rr
+		/**
+		 * this works
+		 *
+		 * engines.get(0).setDirection(Direction.REVERSE);
+		 * engines.get(1).setDirection(Direction.REVERSE);
+		 * // engines.get(2).setDirection(Direction.REVERSE);
+		 * engines.get(3).setDirection(Direction.REVERSE); // rr
+		 *
+		 * */
+
+		// the good combo
+		// engines.get(0).setDirection(Direction.REVERSE);
+		// engines.get(1).setDirection(Direction.REVERSE);
+		// engines.get(2).setDirection(Direction.REVERSE); // non comment
+ 		// engines.get(3).setDirection(Direction.REVERSE); // rr
+
+		// engines.get(1).setDirection(Direction.REVERSE);
+		engines.get(0).setDirection(Direction.FORWARD);
+		engines.get(1).setDirection(Direction.FORWARD);
+		engines.get(2).setDirection(Direction.FORWARD);
+		// engines.get(3).setDirection(Direction.REVERSE);
 
 		this.engines = engines;
 
@@ -81,8 +99,18 @@ public class Wheels {
 	}
 
 	// TODO: implement a feature to track robot's movement disntance
-	public void returnMotorsValues(){
-		forEachEngine((engine, _i) -> telemetry.addData(String.format("%s", _i), engine.getCurrentPosition()));
+	public int returnMotorsValues(){
+		AtomicInteger sum = new AtomicInteger();
+		sum.set(0);
+		// forEachEngine((engine, _i) -> telemetry.addData(String.format("%s", _i), engine.getCurrentPosition()));
+		forEachEngine((engine, _i) -> sum.addAndGet(modulo(engine.getCurrentPosition())));
+		return sum.get() / 4;
+	}
+
+	public int modulo(int number){
+		if(number > 0){ number = number; }
+		else{ number = -number; }
+		return number;
 	}
 
 	public void useEncoders(boolean shouldUse) {

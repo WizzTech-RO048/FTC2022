@@ -29,10 +29,10 @@ public class Sensors {
 	// ------------------------
 	// - Color sensor functions
 	// ------------------------
-	public void startColorSensor(){
-		telemetry.addData("R", colorSensor.red());
-		telemetry.addData("G", colorSensor.green());
-		telemetry.addData("B", colorSensor.blue());
+	public int meanValue(){
+		int meanValue = colorSensor.red() + colorSensor.green() + colorSensor.blue();
+		meanValue = meanValue / 3;
+		return meanValue;
 	}
 
 	// TODO: scan if an object is on the robot
