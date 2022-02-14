@@ -36,6 +36,11 @@ public class Wheels {
 
 	private final ScheduledExecutorService scheduler;
 
+	public int engine1;
+	public int engine2;
+	public int engine3;
+	public int engine4;
+
 	private static DcMotorEx getEngine(HardwareMap map, String name) {
 		DcMotorEx motor = map.get(DcMotorEx.class, name);
 		motor.setMode(RunMode.STOP_AND_RESET_ENCODER);
@@ -90,7 +95,7 @@ public class Wheels {
 		useBrakes(true);
 	}
 
-	private void forEachEngine(EngineFunction fn) {
+	public void forEachEngine(EngineFunction fn) {
 		int index = 0;
 		for (DcMotorEx engine : engines) {
 			fn.apply(engine, index);
@@ -102,8 +107,10 @@ public class Wheels {
 	public int returnMotorsValues(){
 		AtomicInteger sum = new AtomicInteger();
 		sum.set(0);
-		// forEachEngine((engine, _i) -> telemetry.addData(String.format("%s", _i), engine.getCurrentPosition()));
+		forEachEngine((engine, _i) -> telemetry.addData(String.format("%s", _i), modulo(engine.getCurrentPosition())));
 		forEachEngine((engine, _i) -> sum.addAndGet(modulo(engine.getCurrentPosition())));
+		telemetry.addData("meanValue", sum.get() / 4);
+
 		return sum.get() / 4;
 	}
 
@@ -158,6 +165,20 @@ public class Wheels {
 		}
 
 		forEachEngine((engine, i) -> setPower(engine, input[i]));
+	}
+
+
+	public void forward(){
+		move(0.0, 0.0, 1.0);
+		engine1 = modulo(engines.get(0).getCurrentPosition());
+		engine2 = modulo(engines.get(1).getCurrentPosition());
+		engine3 = modulo(engines.get(2).getCurrentPosition());
+		engine4 = modulo(engines.get(3).getCurrentPosition());
+
+		if(engine1 > 2300 && engine2 > 2300 && engine3 > 2300 && engine4 > 2300){
+			stopMotors();
+		}
+
 	}
 
 	private void setPower(DcMotorEx engine, double power) {
@@ -225,7 +246,7 @@ public class Wheels {
 							return true;
 						}
 
-						move(0, 0, normalizeRotationPower(initialPower, rotation));
+						move(0, normalizeRotationPower(initialPower, rotation), 0);
 						return false;
 					}
 				},

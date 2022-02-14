@@ -6,24 +6,33 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.Robot.*;
+
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
+
+import java.util.concurrent.Executors;
 
 @Autonomous(name = "testing")
 public class AutonomousOp extends LinearOpMode {
 
 	private OpenCvCamera webcam;
 
+	Robot robot;
+
 	@Override
 	public void runOpMode() throws InterruptedException{
 		int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
 		webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
 
+		robot = new Robot(hardwareMap, telemetry, Executors.newScheduledThreadPool(1));
+
 		Detector detector = new Detector(telemetry);
 		webcam.setPipeline(detector);
 
+		/*
 		webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
 			@Override
 			public void onOpened() {
@@ -35,8 +44,16 @@ public class AutonomousOp extends LinearOpMode {
 
 			}
 		});
+		 */
 
 		waitForStart();
+
+		while(opModeIsActive()){
+			robot.wheels.forward();
+
+
+			break;
+		}
 
 	}
 

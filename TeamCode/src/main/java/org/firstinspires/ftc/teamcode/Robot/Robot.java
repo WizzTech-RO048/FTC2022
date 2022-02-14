@@ -133,10 +133,30 @@ public class Robot {
 
 	// TODO: write the functions for the robot to move easily and carefully
 	// autonomous movement
-	public void forward(){ wheels.move(0.0, 0.0, 1.0); }
-	public void backward(){ move(0.0, -1.0); }
-	public void left(){ move(-1.0, 0.0); }
-	public void right(){ move(1.0, 0.0); }
+
+	public void forward(){
+		wheels.move(0.0, 0.0, 1.0);
+		// int engine1 = wheels.engines.get(0).getCurrentPosition();
+
+	}
+	public void backward(){
+		wheels.move(0.0, 0.0, -1.0);
+		// if(wheels.returnMotorsValues() >= 300){
+		// 	wheels.stop();
+		// }
+	}
+	public void left(){
+		wheels.move(0.5, 0.0, 0.0);
+		// if(wheels.returnMotorsValues() >= 300){
+		// 	wheels.stop();
+		// }
+	}
+	public void right(){
+		wheels.move(0.0, 0.0, 1.0);
+		// if(wheels.returnMotorsValues() >= 300){
+		// 	wheels.stop();
+		//}
+	}
 
 	private void setMotors(double lf, double lr, double rf, double rr) {
 		final double scale = Stream.of(1.0, lf, lr, rf, rr).mapToDouble(Math::abs).max().getAsDouble();
@@ -168,4 +188,23 @@ public class Robot {
 	// ------------------------
 	public void duckServoOn(){ carouselServo.setPosition(-1.0); }
 	public void duckServoOff(){ carouselServo.setPosition(0.5); }
+
+
+	// ------------------------
+	// - Sensors functions
+	// ------------------------
+	public int meanValue(){
+		int meanValue = sensors.getRed() + sensors.getGreen() + sensors.getBlue();
+		meanValue = meanValue / 3;
+		return meanValue;
+	}
+
+	public boolean objectDetected() {
+		if (meanValue() > 400) {
+			return true;
+		}
+		return false;
+	}
+
+
 }

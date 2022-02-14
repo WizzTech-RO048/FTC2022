@@ -32,12 +32,26 @@ package org.firstinspires.ftc.teamcode.ComputerVision;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledFuture;
+
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.opencv.core.Point;
+import org.opencv.core.Rect;
+
+import org.firstinspires.ftc.teamcode.Robot.*;
+
+import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction;
+import static com.qualcomm.robotcore.hardware.DcMotor.RunMode;
+import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior;
+
 
 /**
  * This 2020-2021 OpMode illustrates the basics of using the TensorFlow Object Detection API to
@@ -63,6 +77,24 @@ public class TensorFlowObjectDetectionWebcam extends LinearOpMode {
 	 *  FreightFrenzy_BC.tflite  0: Ball,  1: Cube
 	 *  FreightFrenzy_DM.tflite  0: Duck,  1: Marker
 	 */
+
+	static final Rect LEFT_ROI = new Rect(
+			new Point(0, 0),
+			new Point(426, 720));
+	static final Rect MIDDLE_ROI = new Rect(
+			new Point(426, 0),
+			new Point(852, 720));
+	static final Rect RIGHT_ROI = new Rect(
+			new Point(852, 0),
+			new Point(1278, 720));
+
+	public enum BarcodePosition {
+		LEFT,
+		MIDDLE,
+		RIGHT,
+		NOT_FOUND
+	}
+
 	private static final String TFOD_MODEL_ASSET = "FreightFrenzy_BCDM.tflite";
 	private static final String[] LABELS = {
 			"Ball",
@@ -70,6 +102,9 @@ public class TensorFlowObjectDetectionWebcam extends LinearOpMode {
 			"Duck",
 			"Marker"
 	};
+
+	Sensors sensors;
+	Robot robot;
 
 	/*
 	 * IMPORTANT: You need to obtain your own license key to use Vuforia. The string below with which
@@ -97,6 +132,12 @@ public class TensorFlowObjectDetectionWebcam extends LinearOpMode {
 	 */
 	private TFObjectDetector tfod;
 
+	int k = 0;
+	int location = 0;
+
+	private ScheduledFuture<?> lastRotation = null, lastArmRaised = null;
+
+
 	@Override
 	public void runOpMode() {
 		// The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that
@@ -117,7 +158,7 @@ public class TensorFlowObjectDetectionWebcam extends LinearOpMode {
 			// to artificially zoom in to the center of image.  For best results, the "aspectRatio" argument
 			// should be set to the value of the images used to create the TensorFlow Object Detection model
 			// (typically 16/9).
-			tfod.setZoom(1.5, 16.0/9.0);
+			tfod.setZoom(1.5, 16.0 / 9.0);
 		}
 
 		/** Wait for the game to begin */
@@ -125,9 +166,17 @@ public class TensorFlowObjectDetectionWebcam extends LinearOpMode {
 		telemetry.update();
 		waitForStart();
 
+		robot = new Robot(hardwareMap, telemetry, Executors.newScheduledThreadPool(1));
+
 		// TODO: implement the posibilty of movement during the detection
 		if (opModeIsActive()) {
 			while (opModeIsActive()) {
+
+				if (robot.objectDetected() == true) {
+					k++;
+				}
+				telemetry.addData("number of the objects on the robot", k);
+
 				if (tfod != null) {
 					// getUpdatedRecognitions() will return null if no new information is available since
 					// the last time that call was made.
@@ -137,33 +186,55 @@ public class TensorFlowObjectDetectionWebcam extends LinearOpMode {
 						// step through the list of recognitions and display boundary info.
 						int i = 0, numMarkers = 0;
 						for (Recognition recognition : updatedRecognitions) {
-							if(recognition.getLabel() == "Marker"){
+							if (recognition.getLabel() == "Duck") {
 								numMarkers++;
+								// TODO: find a way to sort the markers
+
+								int markNumber = markerNumber(recognition);
+								telemetry.addData("mark number", markNumber);
+
+								/**
+								 * A very easily way would be to sort them using their pixels
+								 * locations.
+								 *
+								 * All the data corelated to a marker should be parsed through
+								 * a struct
+								 *
+								 * Then, we can sort all the markers.
+								 *
+								 * WARNING: we can try to classify the marker by using their distance
+								 * corelated to the screen. (E.G: if a marker is in the westest point of
+								 * the screen, then probably it wil be the first marker).*/
+
+								telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
+								telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
+										recognition.getLeft(), recognition.getTop());
+								telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
+										recognition.getRight(), recognition.getBottom());
+
+
+								if(numMarkers == 1){
+									break;
+								}
+
+								i++;
 							}
-							// TODO: find a way to sort the markers
-							/**
-							 * A very easily way would be to sort them using their pixels
-							 * locations.
-							 *
-							 * All the data corelated to a marker should be parsed through
-							 * a struct
-							 *
-							 * Then, we can sort all the markers.
-							 *
-							 * WARNING: we can try to classify the marker by using their distance
-							 * corelated to the screen. (E.G: if a marker is in the westest point of
-							 * the screen, then probably it wil be the first marker).*/
-
-							// TODO: learn the way the markers are numerotated
-
-							telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
-							telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
-									recognition.getLeft(), recognition.getTop());
-							telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
-									recognition.getRight(), recognition.getBottom());
-							i++;
 						}
+
+						robot.forward();
+
+//						if(robot.wheels.returnMotorsValues() >= 400){
+//							robot.wheels.stop();
+//							break;
+//						}
+
+						// robot.left();
+
+
+
 						telemetry.update();
+
+						break;
 					}
 				}
 			}
@@ -185,7 +256,7 @@ public class TensorFlowObjectDetectionWebcam extends LinearOpMode {
 		//  Instantiate the Vuforia engine
 		vuforia = ClassFactory.getInstance().createVuforia(parameters);
 
-		// Loading trackables is not necessary for the TensorFlow Object Detection engine.
+		// Loading trackables	 is not necessary for the TensorFlow Object Detection engine.
 	}
 
 	/**
@@ -201,5 +272,20 @@ public class TensorFlowObjectDetectionWebcam extends LinearOpMode {
 		tfodParameters.inputSize = 320;
 		tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
 		tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);
+	}
+
+	private boolean isLocated(float left, float right, float top, float bottom, Recognition recognition) {
+		if (left <= recognition.getLeft() && right >= recognition.getRight() && top <= recognition.getTop() && bottom >= recognition.getBottom()) {
+			return true;
+		}
+		return false;
+	}
+
+	private int markerNumber(Recognition recognition) {
+		if (isLocated(0, 426, 0, 720, recognition) == true) {
+			return 1; } if (isLocated(426, 852, 0, 720, recognition) == true) {
+				return 1; } if (isLocated(852, 1278, 0, 720, recognition)) {
+					return 1; }
+		return 0;
 	}
 }

@@ -27,8 +27,6 @@ public class MainTeleOp extends OpMode {
 	private int rbPressed = 0;
 	private int dpadLeftPressed = 0;
 
-	TensorFlowObjectDetectionWebcam objectDetector;
-
 	@Override
 	public void init() {
 		robot = new Robot(hardwareMap, telemetry, Executors.newScheduledThreadPool(1));
@@ -38,7 +36,7 @@ public class MainTeleOp extends OpMode {
 		controller1 = new Controller(gamepad1);
 		controller2 = new Controller(gamepad2);
 
-		robot.arm.rotateCage(0.0);
+		robot.arm.rotateCage(initialThrowServerPos);
 
 		servoRotated = false;
 		robot.arm.isArmRaised = false;
@@ -76,6 +74,10 @@ public class MainTeleOp extends OpMode {
 		double x = -gamepad1.right_stick_x;
 		double r = -gamepad1.left_stick_y;
 
+		if(x > 0.75){ x = 0.75; }
+		if(y > 0.75){ y = 0.75; }
+		if(r > 0.75){ r = 0.75; }
+
 		double rightTrigger = controller1.rightTrigger;
 		double leftTrigger = controller1.leftTrigger;
 
@@ -108,10 +110,9 @@ public class MainTeleOp extends OpMode {
 
 		lastArmRaised = robot.arm.moveArm(targetPosition);
 
-
 		// rotating the throwing servo
 		// TODO: one press rotation
-		if(controller1.rightBumberOnce() && targetPosition >= 0.4){
+		if(controller1.rightBumberOnce() && targetPosition >= 0.2){
 			rbPressed++;
 			if(rbPressed % 2 == 1){
 				servoRotated = true;
@@ -123,7 +124,7 @@ public class MainTeleOp extends OpMode {
 		}
 
 
-		if(currentArmPosition < 500 && servoRotated == true){
+		if(targetPosition < 0.3 && servoRotated == true){
 			servoRotated = false;
 			robot.arm.rotateCage(0.0);
 		}
@@ -155,8 +156,8 @@ public class MainTeleOp extends OpMode {
 		telemetry.addData("brakes status(on/off)", robot.arm.brakes);
 		telemetry.addData("is arm raised?", robot.arm.isArmRaised);
 		telemetry.addData("current arm position", currentArmPosition);
-		telemetry.addData("meanValue", robot.sensors.meanValue());
-		telemetry.addData("motors value", robot.wheels.returnMotorsValues());
+		telemetry.addData("meanValue", robot.meanValue());
+		robot.wheels.returnMotorsValues();
 
 		// ------------------------
 		// - Computer vision

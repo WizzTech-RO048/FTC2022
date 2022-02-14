@@ -14,16 +14,24 @@ public class Detector extends OpenCvPipeline {
 	Mat mat = new Mat();
 
 	static final Rect LEFT_ROI = new Rect(
-			new Point(30, 30),
-			new Point(640, 1050));
-
+			new Point( 0, 0 ),
+			new Point( 426, 720 ) );
 	static final Rect MIDDLE_ROI = new Rect(
-			new Point(640, 30),
-			new Point(1250, 1050));
-
+			new Point( 426, 0 ),
+			new Point( 852, 720 ) );
 	static final Rect RIGHT_ROI = new Rect(
-			new Point(1250, 30),
-			new Point(1860, 1050));
+			new Point( 852, 0 ),
+			new Point( 1278, 720 ) );
+
+	public enum BarcodePosition {
+		LEFT,
+		MIDDLE,
+		RIGHT,
+		NOT_FOUND
+	}
+
+	private BarcodePosition barcodePosition;
+
 
 	static double COLOR_THRESHOLD = 0.4;
 
@@ -66,9 +74,23 @@ public class Detector extends OpenCvPipeline {
 		if(objectLeft){ telemetry.addLine("left"); }
 		if(objectMiddle){ telemetry.addLine("middle"); }
 		if(objectRight){ telemetry.addLine("right"); }
+		else{ telemetry.addLine("barcode not found"); }
+
+		Scalar elementColor = new Scalar( 255, 0, 0 );
+		Scalar notElement = new Scalar( 0, 255, 0 );
+
+		Imgproc.rectangle( mat, LEFT_ROI, barcodePosition == BarcodePosition.LEFT ? notElement : elementColor );
+		Imgproc.rectangle( mat, RIGHT_ROI, barcodePosition == BarcodePosition.RIGHT ? notElement : elementColor );
+		Imgproc.rectangle( mat, MIDDLE_ROI, barcodePosition == BarcodePosition.MIDDLE ? notElement : elementColor );
 
 		telemetry.update();
 
 		return mat;
 	}
+
+	public BarcodePosition getBarcodePosition( ) {
+		return barcodePosition;
+	}
+
+
 }

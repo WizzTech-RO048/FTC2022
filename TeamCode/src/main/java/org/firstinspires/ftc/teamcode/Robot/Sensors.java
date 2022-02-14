@@ -29,14 +29,9 @@ public class Sensors {
 	// ------------------------
 	// - Color sensor functions
 	// ------------------------
-	public int meanValue(){
-		int meanValue = colorSensor.red() + colorSensor.green() + colorSensor.blue();
-		meanValue = meanValue / 3;
-		return meanValue;
-	}
-
-	// TODO: scan if an object is on the robot
-
+	public int getRed(){ return colorSensor.red(); }
+	public int getGreen(){ return colorSensor.green(); }
+	public int getBlue(){ return colorSensor.blue(); }
 
 	static class Parameters{
 		ColorSensor colorSensor;
