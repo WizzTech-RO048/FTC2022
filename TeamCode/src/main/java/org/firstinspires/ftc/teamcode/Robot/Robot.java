@@ -58,10 +58,10 @@ public class Robot {
         rightRear.setDirection(DcMotorSimple.Direction.FORWARD);
         intakeMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        var orientation = hardwareMap.get(BNO055IMU.class, "imu");
+        BNO055IMU orientation = hardwareMap.get(BNO055IMU.class, "imu");
         orientation.initialize(new BNO055IMU.Parameters());
 
-        var wheelsParams = new Wheels.Parameters();
+        Wheels.Parameters wheelsParams = new Wheels.Parameters();
         wheelsParams.hardwareMap = hardwareMap;
         wheelsParams.telemetry = telemetry;
         wheelsParams.orientationSensor = orientation;
@@ -70,7 +70,7 @@ public class Robot {
         wheelsParams.encoderResolution = 384.5;
         wheels = new Wheels(wheelsParams);
 
-        var armParameters = new Arm.Parameters();
+        Arm.Parameters armParameters = new Arm.Parameters();
         armParameters.arm = hardwareMap.get(DcMotorEx.class, "armMotor");
         armParameters.throwServo = hardwareMap.servo.get("throwServo");
         armParameters.telemetry = telemetry;
@@ -78,7 +78,7 @@ public class Robot {
         armParameters.armRaisedPosition = SCISSORS_ARM_FINAL_POS;
         arm = new Arm(armParameters);
 
-        var sensorsParameters = new Sensors.Parameters();
+        Sensors.Parameters sensorsParameters = new Sensors.Parameters();
         sensorsParameters.colorSensor = hardwareMap.get(ColorSensor.class, "colorSensor");
         sensorsParameters.scheduler = scheduler;
         sensorsParameters.telemetry = telemetry;

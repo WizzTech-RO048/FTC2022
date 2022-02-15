@@ -37,7 +37,7 @@ public class Wheels {
 	private final ScheduledExecutorService scheduler;
 
 	private static DcMotorEx getEngine(HardwareMap map, String name) {
-		var motor = map.get(DcMotorEx.class, name);
+		DcMotorEx motor = map.get(DcMotorEx.class, name);
 		motor.setMode(RunMode.STOP_AND_RESET_ENCODER);
 		return motor;
 	}
@@ -47,8 +47,8 @@ public class Wheels {
 		this.orientation = Objects.requireNonNull(params.orientationSensor, "Orientation sensor was not set");
 		this.scheduler = Objects.requireNonNull(params.scheduler, "Scheduler was not set");
 
-		var map = Objects.requireNonNull(params.hardwareMap, "Hardware map was not passed");
-		var engines = new ArrayList<DcMotorEx>();
+		HardwareMap map = Objects.requireNonNull(params.hardwareMap, "Hardware map was not passed");
+		ArrayList<DcMotorEx> engines = new ArrayList<>();
 
 		for (String name : HW_MOTOR_NAMES) {
 			engines.add(getEngine(map, name));
@@ -73,13 +73,13 @@ public class Wheels {
 	}
 
 	public void useEncoders(boolean shouldUse) {
-		var mode = shouldUse ? RunMode.RUN_USING_ENCODER : RunMode.RUN_WITHOUT_ENCODER;
+		RunMode mode = shouldUse ? RunMode.RUN_USING_ENCODER : RunMode.RUN_WITHOUT_ENCODER;
 
 		engines.forEach(engine -> engine.setMode(mode));
 	}
 
 	public void useBrakes(boolean shouldUse) {
-		var behavior = shouldUse ? ZeroPowerBehavior.BRAKE : ZeroPowerBehavior.FLOAT;
+		ZeroPowerBehavior behavior = shouldUse ? ZeroPowerBehavior.BRAKE : ZeroPowerBehavior.FLOAT;
 
 		engines.forEach(engine -> engine.setZeroPowerBehavior(behavior));
 	}
@@ -94,17 +94,17 @@ public class Wheels {
 		y = normalize(y);
 		r = normalize(r);
 
-		var input = new double[]{
+		double[] input = {
 				y + x + r, // left front
 				y - x + r, // left rear
 				y - x - r, // right front
 				y + x - r  // right rear
 		};
 
-		var highest = 0.0;
+		double highest = 0.0;
 
-		for (var d : input) {
-			var abs = Math.abs(d);
+		for (double d : input) {
+			double abs = Math.abs(d);
 			if (abs > highest) {
 				highest = abs;
 			}
@@ -112,7 +112,7 @@ public class Wheels {
 
 		highest = Math.max(highest, 1);
 
-		for (var i = 0; i < input.length; i++) {
+		for (int i = 0; i < input.length; i++) {
 			input[i] /= highest;
 		}
 
@@ -129,8 +129,8 @@ public class Wheels {
 	}
 
 	private double getOrientation(boolean direction) {
-		var o = orientation.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
-		var angle = o.thirdAngle > 0 ? o.thirdAngle : 360 + o.thirdAngle;
+		Orientation o = orientation.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
+		double angle = o.thirdAngle > 0 ? o.thirdAngle : 360 + o.thirdAngle;
 		return direction ? angle : 360 - angle;
 	}
 
@@ -167,12 +167,12 @@ public class Wheels {
 
 		// Positive degrees - clockwise movement - negative power
 		// Negative degrees - counter-clockwise movement - positive power
-		var initialPower = -Math.signum(degrees);
-		var isPositiveDirection = initialPower < 0;
+		double initialPower = -Math.signum(degrees);
+		boolean isPositiveDirection = initialPower < 0;
 
 		lastMovement = Utils.poll(
 				scheduler,
-				new Supplier<>() {
+				new Supplier<Boolean>() {
 					private double rotation = Math.abs(degrees);
 					private double prevOrientation = getOrientation(isPositiveDirection);
 
@@ -208,21 +208,21 @@ public class Wheels {
 			return null;
 		}
 
-		var initialPower = Math.signum(meters);
-		var initialPosition = orientation.getPosition();
-		var unit = initialPosition.unit;
-		var initialY = unit.toMeters(initialPosition.y);
+		double initialPower = Math.signum(meters);
+		Position initialPosition = orientation.getPosition();
+		DistanceUnit unit = initialPosition.unit;
+		double initialY = unit.toMeters(initialPosition.y);
 
 		lastMovement = Utils.poll(
 				scheduler,
-				new Supplier<>() {
+				new Supplier<Boolean>() {
 					private double prevY = initialY;
 					private double movement = Math.abs(meters);
 
 					@Override
 					public Boolean get() {
-						var currentY = unit.toMeters(orientation.getPosition().y);
-						var delta = Math.abs(currentY - prevY);
+						double currentY = unit.toMeters(orientation.getPosition().y);
+						double delta = Math.abs(currentY - prevY);
 						prevY = currentY;
 						movement -= delta;
 
@@ -230,7 +230,7 @@ public class Wheels {
 							return true;
 						}
 
-						var power = normalizePower(initialPower, movement, 0.25);
+						double power = normalizePower(initialPower, movement, 0.25);
 						move(power, power, 0);
 						return false;
 					}
