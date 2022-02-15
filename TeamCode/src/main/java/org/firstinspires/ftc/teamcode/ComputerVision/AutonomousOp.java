@@ -15,7 +15,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.util.concurrent.Executors;
 
-@Autonomous(name = "testing")
+@Autonomous(name = "Autonomie")
 public class AutonomousOp extends LinearOpMode {
 
 	private OpenCvCamera webcam;
@@ -45,11 +45,6 @@ public class AutonomousOp extends LinearOpMode {
 		});
 
 		waitForStart();
-
-		while(opModeIsActive()){
-
-		}
-
 	}
 
 }

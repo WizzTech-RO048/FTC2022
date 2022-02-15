@@ -1,11 +1,9 @@
 package org.firstinspires.ftc.teamcode.ComputerVision;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.opencv.core.Core;
-import org.opencv.core.Mat;
-import org.opencv.core.Point;
-import org.opencv.core.Rect;
-import org.opencv.core.Scalar;
+import org.opencv.core.*;
+
+import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
@@ -14,14 +12,14 @@ public class Detector extends OpenCvPipeline {
 	Mat mat = new Mat();
 
 	static final Rect LEFT_ROI = new Rect(
-			new Point( 0, 0 ),
-			new Point( 426, 720 ) );
+			new Point(0, 0),
+			new Point(426, 720));
 	static final Rect MIDDLE_ROI = new Rect(
-			new Point( 426, 0 ),
-			new Point( 852, 720 ) );
+			new Point(426, 0),
+			new Point(852, 720));
 	static final Rect RIGHT_ROI = new Rect(
-			new Point( 852, 0 ),
-			new Point( 1278, 720 ) );
+			new Point(852, 0),
+			new Point(1278, 720));
 
 	public enum BarcodePosition {
 		LEFT,
@@ -32,16 +30,17 @@ public class Detector extends OpenCvPipeline {
 
 	private BarcodePosition barcodePosition;
 
+	static double COLOR_THRESHOLD = 0.3;
 
-	static double COLOR_THRESHOLD = 0.4;
-
-	public Detector(Telemetry t){ telemetry = t; }
+	public Detector(Telemetry t) {
+		telemetry = t;
+	}
 
 	@Override
-	public Mat processFrame(Mat input){
+	public Mat processFrame(Mat input) {
 		Imgproc.cvtColor(input, mat, Imgproc.COLOR_RGB2HSV);
-		Scalar lowHSV = new Scalar(48, 79, 39);
-		Scalar highHSV = new Scalar(48, 100, 100);
+		Scalar lowHSV = new Scalar(57, 69, 63);
+		Scalar highHSV = new Scalar(57, 100, 100);
 
 		Core.inRange(mat, lowHSV, highHSV, mat);
 
@@ -53,9 +52,9 @@ public class Detector extends OpenCvPipeline {
 		double middleValue = Core.sumElems(middle).val[0] / MIDDLE_ROI.area() / 2;
 		double rightValue = Core.sumElems(right).val[0] / RIGHT_ROI.area() / 2;
 
-		leftValue.release();
-		middleValue.release();
-		rightValue.release();
+		// leftValue.release();
+		// middleValue.release();
+		// rightValue.release();
 
 		telemetry.addData("Left raw value", (int) Core.sumElems(left).val[0]);
 		telemetry.addData("Right raw value", (int) Core.sumElems(right).val[0]);
@@ -71,24 +70,43 @@ public class Detector extends OpenCvPipeline {
 
 		Imgproc.cvtColor(mat, mat, Imgproc.COLOR_GRAY2BGR);
 
-		if(objectLeft){ telemetry.addLine("left"); }
-		if(objectMiddle){ telemetry.addLine("middle"); }
-		if(objectRight){ telemetry.addLine("right"); }
-		else{ telemetry.addLine("barcode not found"); }
+		if (objectLeft) {
+			telemetry.addLine("left");
+		}
+		if (objectMiddle) {
+			telemetry.addLine("middle");
+		}
+		if (objectRight) {
+			telemetry.addLine("right");
+		} else {
+			telemetry.addLine("barcode not found");
+		}
 
-		Scalar elementColor = new Scalar( 255, 0, 0 );
-		Scalar notElement = new Scalar( 0, 255, 0 );
+		Scalar elementColor = new Scalar(255, 0, 0);
+		Scalar notElement = new Scalar(0, 255, 0);
 
-		Imgproc.rectangle( mat, LEFT_ROI, barcodePosition == BarcodePosition.LEFT ? notElement : elementColor );
-		Imgproc.rectangle( mat, RIGHT_ROI, barcodePosition == BarcodePosition.RIGHT ? notElement : elementColor );
-		Imgproc.rectangle( mat, MIDDLE_ROI, barcodePosition == BarcodePosition.MIDDLE ? notElement : elementColor );
+		Imgproc.rectangle(mat, LEFT_ROI, barcodePosition == BarcodePosition.LEFT ? notElement : elementColor);
+		Imgproc.rectangle(mat, RIGHT_ROI, barcodePosition == BarcodePosition.RIGHT ? notElement : elementColor);
+		Imgproc.rectangle(mat, MIDDLE_ROI, barcodePosition == BarcodePosition.MIDDLE ? notElement : elementColor);
 
 		telemetry.update();
 
-		return mat;
+		Imgproc.cvtColor(input, input, Imgproc.COLOR_HSV2RGB);
+
+		saveImage(input);
+
+		return input;
 	}
 
-	public BarcodePosition getBarcodePosition( ) {
+	public void saveImage(Mat mat){
+		Imgcodecs imageCodecs = new Imgcodecs();
+
+		String file2 = "/storage/self/primary/DCIM/image2.png";
+
+		imageCodecs.imwrite(file2, mat);
+	}
+
+	public BarcodePosition getBarcodePosition() {
 		return barcodePosition;
 	}
 

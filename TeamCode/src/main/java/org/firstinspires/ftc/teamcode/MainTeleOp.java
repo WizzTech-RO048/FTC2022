@@ -106,13 +106,12 @@ public class MainTeleOp extends OpMode {
 			targetPosition -= 0.1;
 		}
 
-		if(targetPosition == 0.0){ robot.arm.isArmRaised = false; } else{ robot.arm.isArmRaised = true; }
+		robot.arm.isArmRaised = isZero(targetPosition);
 
 		lastArmRaised = robot.arm.moveArm(targetPosition);
 
 		// rotating the throwing servo
-		// TODO: one press rotation
-		if(controller1.rightBumberOnce() && targetPosition >= 0.2){
+		if(controller1.rightBumberOnce()){
 			rbPressed++;
 			if(rbPressed % 2 == 1){
 				servoRotated = true;
@@ -123,11 +122,14 @@ public class MainTeleOp extends OpMode {
 			}
 		}
 
+		/*
 
-		if(targetPosition < 0.3 && servoRotated == true){
+		if(servoRotated){
 			servoRotated = false;
 			robot.arm.rotateCage(0.0);
 		}
+
+		*/
 
 		// ------------------------
 		// - Intake system
