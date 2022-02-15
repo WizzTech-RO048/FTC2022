@@ -1,7 +1,7 @@
 // TODO: print team's number
 // TODO: try to print the stickers ASAP
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.ComputerVision;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -32,7 +32,6 @@ public class AutonomousOp extends LinearOpMode {
 		Detector detector = new Detector(telemetry);
 		webcam.setPipeline(detector);
 
-		/*
 		webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
 			@Override
 			public void onOpened() {
@@ -44,15 +43,11 @@ public class AutonomousOp extends LinearOpMode {
 
 			}
 		});
-		 */
 
 		waitForStart();
 
 		while(opModeIsActive()){
-			robot.wheels.forward();
 
-
-			break;
 		}
 
 	}

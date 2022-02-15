@@ -158,11 +158,6 @@ public class MainTeleOp extends OpMode {
 		telemetry.addData("current arm position", currentArmPosition);
 		telemetry.addData("meanValue", robot.meanValue());
 		robot.wheels.returnMotorsValues();
-
-		// ------------------------
-		// - Computer vision
-		// ------------------------
-		// objectDetector.initTfod();
 	}
 
 	private static boolean isZero(double value) {

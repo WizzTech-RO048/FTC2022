@@ -36,11 +36,6 @@ public class Wheels {
 
 	private final ScheduledExecutorService scheduler;
 
-	public int engine1;
-	public int engine2;
-	public int engine3;
-	public int engine4;
-
 	private static DcMotorEx getEngine(HardwareMap map, String name) {
 		DcMotorEx motor = map.get(DcMotorEx.class, name);
 		motor.setMode(RunMode.STOP_AND_RESET_ENCODER);
@@ -59,28 +54,10 @@ public class Wheels {
 			engines.add(getEngine(map, name));
 		}
 
-		// FIXME: right-left movement of the robot
-		/**
-		 * this works
-		 *
-		 * engines.get(0).setDirection(Direction.REVERSE);
-		 * engines.get(1).setDirection(Direction.REVERSE);
-		 * // engines.get(2).setDirection(Direction.REVERSE);
-		 * engines.get(3).setDirection(Direction.REVERSE); // rr
-		 *
-		 * */
 
-		// the good combo
-		// engines.get(0).setDirection(Direction.REVERSE);
-		// engines.get(1).setDirection(Direction.REVERSE);
-		// engines.get(2).setDirection(Direction.REVERSE); // non comment
- 		// engines.get(3).setDirection(Direction.REVERSE); // rr
-
-		// engines.get(1).setDirection(Direction.REVERSE);
 		engines.get(0).setDirection(Direction.FORWARD);
 		engines.get(1).setDirection(Direction.FORWARD);
 		engines.get(2).setDirection(Direction.FORWARD);
-		// engines.get(3).setDirection(Direction.REVERSE);
 
 		this.engines = engines;
 
@@ -167,19 +144,6 @@ public class Wheels {
 		forEachEngine((engine, i) -> setPower(engine, input[i]));
 	}
 
-
-	public void forward(){
-		move(0.0, 0.0, 1.0);
-		engine1 = modulo(engines.get(0).getCurrentPosition());
-		engine2 = modulo(engines.get(1).getCurrentPosition());
-		engine3 = modulo(engines.get(2).getCurrentPosition());
-		engine4 = modulo(engines.get(3).getCurrentPosition());
-
-		if(engine1 > 2300 && engine2 > 2300 && engine3 > 2300 && engine4 > 2300){
-			stopMotors();
-		}
-
-	}
 
 	private void setPower(DcMotorEx engine, double power) {
 		if (engine.getMode() == RunMode.RUN_USING_ENCODER) {

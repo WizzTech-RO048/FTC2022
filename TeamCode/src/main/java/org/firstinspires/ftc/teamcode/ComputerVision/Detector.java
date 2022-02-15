@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.ComputerVision;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.core.Core;
@@ -40,8 +40,8 @@ public class Detector extends OpenCvPipeline {
 	@Override
 	public Mat processFrame(Mat input){
 		Imgproc.cvtColor(input, mat, Imgproc.COLOR_RGB2HSV);
-		Scalar lowHSV = new Scalar(212, 100, 14);
-		Scalar highHSV = new Scalar(212, 100, 55);
+		Scalar lowHSV = new Scalar(48, 79, 39);
+		Scalar highHSV = new Scalar(48, 100, 100);
 
 		Core.inRange(mat, lowHSV, highHSV, mat);
 
@@ -53,9 +53,9 @@ public class Detector extends OpenCvPipeline {
 		double middleValue = Core.sumElems(middle).val[0] / MIDDLE_ROI.area() / 2;
 		double rightValue = Core.sumElems(right).val[0] / RIGHT_ROI.area() / 2;
 
-		// leftValue.release();
-		// middleValue.release();
-		// rightValue.release();
+		leftValue.release();
+		middleValue.release();
+		rightValue.release();
 
 		telemetry.addData("Left raw value", (int) Core.sumElems(left).val[0]);
 		telemetry.addData("Right raw value", (int) Core.sumElems(right).val[0]);
