@@ -94,17 +94,17 @@ public class Wheels {
 		y = normalize(y);
 		r = normalize(r);
 
-		double[] input = {
+		var input = new double[]{
 				y + x + r, // left front
 				y - x + r, // left rear
 				y - x - r, // right front
 				y + x - r  // right rear
 		};
 
-		double highest = 0;
+		var highest = 0.0;
 
-		for (double d : input) {
-			double abs = Math.abs(d);
+		for (var d : input) {
+			var abs = Math.abs(d);
 			if (abs > highest) {
 				highest = abs;
 			}
@@ -112,7 +112,7 @@ public class Wheels {
 
 		highest = Math.max(highest, 1);
 
-		for (int i = 0; i < input.length; i++) {
+		for (var i = 0; i < input.length; i++) {
 			input[i] /= highest;
 		}
 
@@ -134,10 +134,10 @@ public class Wheels {
 		return direction ? angle : 360 - angle;
 	}
 
-	private ScheduledFuture<?> lastRotation = null;
+	private ScheduledFuture<?> lastMovement = null;
 
-	private boolean isRotating() {
-		return !Utils.isDone(lastRotation);
+	private boolean isMoving() {
+		return !Utils.isDone(lastMovement);
 	}
 
 	/**
@@ -161,14 +161,16 @@ public class Wheels {
 			return null;
 		}
 
-		if (isRotating() && !lastRotation.cancel(true)) {
+		if (isMoving() && !lastMovement.cancel(true)) {
 			return null;
 		}
 
+		// Positive degrees - clockwise movement - negative power
+		// Negative degrees - counter-clockwise movement - positive power
 		var initialPower = -Math.signum(degrees);
 		var isPositiveDirection = initialPower < 0;
 
-		lastRotation = Utils.poll(
+		lastMovement = Utils.poll(
 				scheduler,
 				new Supplier<>() {
 					private double rotation = Math.abs(degrees);
@@ -185,7 +187,7 @@ public class Wheels {
 							return true;
 						}
 
-						move(0, normalizeRotationPower(initialPower, rotation), 0);
+						move(0, normalizePower(initialPower, rotation, 60 /* degrees */), 0);
 						return false;
 					}
 				},
@@ -194,7 +196,51 @@ public class Wheels {
 				MILLISECONDS
 		);
 
-		return lastRotation;
+		return lastMovement;
+	}
+
+	public ScheduledFuture<?> moveFor(double meters) {
+		if (Utils.inVicinity(meters, 0, 1e-4)) {
+			return null;
+		}
+
+		if (isMoving() && !lastMovement.cancel(true)) {
+			return null;
+		}
+
+		var initialPower = Math.signum(meters);
+		var initialPosition = orientation.getPosition();
+		var unit = initialPosition.unit;
+		var initialY = unit.toMeters(initialPosition.y);
+
+		lastMovement = Utils.poll(
+				scheduler,
+				new Supplier<>() {
+					private double prevY = initialY;
+					private double movement = Math.abs(meters);
+
+					@Override
+					public Boolean get() {
+						var currentY = unit.toMeters(orientation.getPosition().y);
+						var delta = Math.abs(currentY - prevY);
+						prevY = currentY;
+						movement -= delta;
+
+						if (Utils.inVicinity(movement, 0, 1e-3)) {
+							return true;
+						}
+
+						var power = normalizePower(initialPower, movement, 0.25);
+						move(power, power, 0);
+						return false;
+					}
+				},
+				this::stopMotors,
+				5,
+				MILLISECONDS
+		);
+
+		return lastMovement;
 	}
 
 	private void stopMotors() {
@@ -205,7 +251,7 @@ public class Wheels {
 	 * Stop any movement or rotation of the robot.
 	 */
 	public void stop() {
-		if (isRotating() && lastRotation.cancel(true)) {
+		if (isMoving() && lastMovement.cancel(true)) {
 			return;
 		}
 
@@ -216,12 +262,12 @@ public class Wheels {
 		return Utils.clamp(val, -1, 1);
 	}
 
-	private static double normalizeRotationPower(double initialPower, double degreesLeft) {
-		if (degreesLeft > 60) {
+	private static double normalizePower(double initialPower, double movementLeft, double threshold) {
+		if (movementLeft > threshold) {
 			return initialPower;
 		}
 
-		return Utils.interpolate(initialPower, Math.signum(initialPower) * 0.05, (60 - degreesLeft) / 60, 1.1);
+		return Utils.interpolate(initialPower, Math.signum(initialPower) * 0.05, (threshold - movementLeft) / threshold, 1.1);
 	}
 
 	static class Parameters {
