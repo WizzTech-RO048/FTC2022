@@ -27,7 +27,7 @@ public class MovementTeleOp extends OpMode {
 
     @Override
     public void loop() {
-        if (Utils.inVicinity(lastMovementModification, time, 0.2)) {
+        if (!Utils.inVicinity(lastMovementModification, time, 0.2)) {
             if (gamepad1.dpad_up) {
                 movementMeters += 0.1;
             } else if (gamepad1.dpad_down) {

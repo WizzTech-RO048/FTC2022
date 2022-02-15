@@ -53,9 +53,9 @@ public class Detector extends OpenCvPipeline {
 		double middleValue = Core.sumElems(middle).val[0] / MIDDLE_ROI.area() / 2;
 		double rightValue = Core.sumElems(right).val[0] / RIGHT_ROI.area() / 2;
 
-		leftValue.release();
-		middleValue.release();
-		rightValue.release();
+		// leftValue.release();
+		// middleValue.release();
+		// rightValue.release();
 
 		telemetry.addData("Left raw value", (int) Core.sumElems(left).val[0]);
 		telemetry.addData("Right raw value", (int) Core.sumElems(right).val[0]);

@@ -172,9 +172,13 @@ public class TensorFlowObjectDetectionWebcam extends LinearOpMode {
 		if (opModeIsActive()) {
 			while (opModeIsActive()) {
 
+
+				/*
 				if (robot.objectDetected() == true) {
 					k++;
 				}
+
+				 */
 				telemetry.addData("number of the objects on the robot", k);
 
 				if (tfod != null) {
@@ -221,7 +225,7 @@ public class TensorFlowObjectDetectionWebcam extends LinearOpMode {
 							}
 						}
 
-						robot.forward();
+						// robot.forward();
 
 //						if(robot.wheels.returnMotorsValues() >= 400){
 //							robot.wheels.stop();

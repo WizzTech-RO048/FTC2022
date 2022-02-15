@@ -208,30 +208,40 @@ public class Wheels {
 			return null;
 		}
 
-		double initialPower = Math.signum(meters);
+		double initialPower = Math.signum(meters) / 2;
 		Position initialPosition = orientation.getPosition();
 		DistanceUnit unit = initialPosition.unit;
-		double initialY = unit.toMeters(initialPosition.y);
+		double initialY = unit.toMeters(initialPosition.x);
+		double finalY = unit.toMeters(initialY) + meters;
+
+		telemetry.setAutoClear(false);
+		telemetry
+				.addData("Initial position", initialPosition)
+				.setRetained(true)
+				.addData("Initial power", initialPower)
+				.setRetained(true);
 
 		lastMovement = Utils.poll(
 				scheduler,
 				new Supplier<Boolean>() {
-					private double prevY = initialY;
-					private double movement = Math.abs(meters);
-
 					@Override
 					public Boolean get() {
-						double currentY = unit.toMeters(orientation.getPosition().y);
-						double delta = Math.abs(currentY - prevY);
-						prevY = currentY;
-						movement -= delta;
+						double currentY = unit.toMeters(orientation.getPosition().x);
+						double movementLeft = Math.abs(finalY - currentY);
 
-						if (Utils.inVicinity(movement, 0, 1e-3)) {
+						telemetry.clear();
+						telemetry
+								.addData("Current position", currentY)
+								.addData("Final position", finalY)
+								.addData("Movement left", movementLeft);
+						telemetry.update();
+
+						if ((finalY < 0 && currentY <= finalY) || (finalY >= 0 && currentY >= finalY)) {
 							return true;
 						}
 
-						double power = normalizePower(initialPower, movement, 0.25);
-						move(power, power, 0);
+						double power = normalizePower(initialPower, movementLeft, 0.33);
+						move(0, 0, power);
 						return false;
 					}
 				},
