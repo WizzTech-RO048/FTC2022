@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Objects;
 
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
+import java.util.stream.IntStream;
 
 import static java.util.concurrent.TimeUnit.*;
 
@@ -72,41 +72,16 @@ public class Wheels {
 		useBrakes(true);
 	}
 
-	public void forEachEngine(EngineFunction fn) {
-		int index = 0;
-		for (DcMotorEx engine : engines) {
-			fn.apply(engine, index);
-			index++;
-		}
-	}
-
-	// TODO: implement a feature to track robot's movement disntance
-	public int returnMotorsValues(){
-		AtomicInteger sum = new AtomicInteger();
-		sum.set(0);
-		forEachEngine((engine, _i) -> telemetry.addData(String.format("%s", _i), modulo(engine.getCurrentPosition())));
-		forEachEngine((engine, _i) -> sum.addAndGet(modulo(engine.getCurrentPosition())));
-		telemetry.addData("meanValue", sum.get() / 4);
-
-		return sum.get() / 4;
-	}
-
-	public int modulo(int number){
-		if(number > 0){ number = number; }
-		else{ number = -number; }
-		return number;
-	}
-
 	public void useEncoders(boolean shouldUse) {
 		RunMode mode = shouldUse ? RunMode.RUN_USING_ENCODER : RunMode.RUN_WITHOUT_ENCODER;
 
-		forEachEngine((engine, _i) -> engine.setMode(mode));
+		engines.forEach(engine -> engine.setMode(mode));
 	}
 
 	public void useBrakes(boolean shouldUse) {
 		ZeroPowerBehavior behavior = shouldUse ? ZeroPowerBehavior.BRAKE : ZeroPowerBehavior.FLOAT;
 
-		forEachEngine((engine, _i) -> engine.setZeroPowerBehavior(behavior));
+		engines.forEach(engine -> engine.setZeroPowerBehavior(behavior));
 	}
 
 	/**
@@ -141,7 +116,7 @@ public class Wheels {
 			input[i] /= highest;
 		}
 
-		forEachEngine((engine, i) -> setPower(engine, input[i]));
+		IntStream.range(0, input.length).forEach(i -> setPower(engines.get(i), input[i]));
 	}
 
 
@@ -223,7 +198,7 @@ public class Wheels {
 	}
 
 	private void stopMotors() {
-		forEachEngine((engine, _i) -> setPower(engine, 0.0));
+		engines.forEach(engine -> setPower(engine, 0.0));
 	}
 
 	/**
@@ -275,10 +250,5 @@ public class Wheels {
 		 * The rotations per minute of the engine.
 		 */
 		public double rpm = 0;
-	}
-
-	@FunctionalInterface
-	private interface EngineFunction {
-		void apply(DcMotorEx engine, int index);
 	}
 }
