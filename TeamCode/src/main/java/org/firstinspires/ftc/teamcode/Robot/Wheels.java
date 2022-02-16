@@ -220,11 +220,15 @@ public class Wheels {
 						return true;
 					}
 
-
 					double power = normalizePower(initialPower, movementLeft, 330);
 
 					telemetry.clearAll();
-					telemetry.addData("Current position", currentPosition).setRetained(true).addData("Power", power).setRetained(true);
+					telemetry
+							.addData("Current position", currentPosition).setRetained(true)
+							.addData("Current X", currentX).setRetained(true)
+							.addData("Final X", finalX).setRetained(true)
+							.addData("Movement left", movementLeft).setRetained(true)
+							.addData("Power", power).setRetained(true);
 					telemetry.update();
 
 					move(0, 0, power);
@@ -234,7 +238,7 @@ public class Wheels {
 					stopMotors();
 					orientation.stopAccelerationIntegration();
 				},
-				5,
+				1,
 				MILLISECONDS
 		);
 
