@@ -44,7 +44,7 @@ public class MovementTeleOp extends OpMode {
         } else if (gamepad1.x) {
             movementMeters = 0;
         } else if (gamepad1.a && Utils.isDone(lastMovement)) {
-            lastMovement = robot.wheels.moveFor(movementMeters);
+            lastMovement = robot.wheels.moveFor(movementMeters, 1.0 / 3);
         }
 
         lastMovementModification = time;

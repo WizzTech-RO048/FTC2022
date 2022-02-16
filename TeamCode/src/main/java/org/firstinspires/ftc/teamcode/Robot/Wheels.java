@@ -183,7 +183,7 @@ public class Wheels {
 		return lastMovement;
 	}
 
-	public ScheduledFuture<?> moveFor(double meters) {
+	public ScheduledFuture<?> moveFor(double meters, double power) {
 		if (Utils.inVicinity(meters, 0, 1e-4)) {
 			return null;
 		}
@@ -195,7 +195,6 @@ public class Wheels {
 		orientation.startAccelerationIntegration(new Position(), new Velocity(), 1);
 
 		double movement = meters * 1000;
-		double initialPower = Math.signum(movement) / 2;
 		Position initialPosition = orientation.getPosition();
 		double initialX = initialPosition.unit.toMm(initialPosition.x);
 		double finalX = initialX + movement;
@@ -210,8 +209,6 @@ public class Wheels {
 					if ((finalX < 0 && currentX <= finalX) || (finalX >= 0 && currentX >= finalX)) {
 						return true;
 					}
-
-					double power = normalizePower(initialPower, movementLeft, 330);
 
 					telemetry.clearAll();
 					telemetry
