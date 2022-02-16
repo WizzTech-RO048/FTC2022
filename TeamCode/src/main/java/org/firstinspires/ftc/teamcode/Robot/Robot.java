@@ -60,7 +60,6 @@ public class Robot {
 
         BNO055IMU orientation = hardwareMap.get(BNO055IMU.class, "imu");
         orientation.initialize(new BNO055IMU.Parameters());
-        orientation.startAccelerationIntegration(null, null, 1);
 
         Wheels.Parameters wheelsParams = new Wheels.Parameters();
         wheelsParams.hardwareMap = hardwareMap;

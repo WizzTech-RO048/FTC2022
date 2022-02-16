@@ -208,6 +208,8 @@ public class Wheels {
 			return null;
 		}
 
+		orientation.startAccelerationIntegration(new Position(), null, 2);
+
 		double initialPower = Math.signum(meters) / 2;
 		Position initialPosition = orientation.getPosition();
 		DistanceUnit unit = initialPosition.unit;
@@ -223,29 +225,29 @@ public class Wheels {
 
 		lastMovement = Utils.poll(
 				scheduler,
-				new Supplier<Boolean>() {
-					@Override
-					public Boolean get() {
-						double currentY = unit.toMeters(orientation.getPosition().x);
-						double movementLeft = Math.abs(finalY - currentY);
+				() -> {
+					double currentY = unit.toMeters(orientation.getPosition().x);
+					double movementLeft = Math.abs(finalY - currentY);
 
-						telemetry.clear();
-						telemetry
-								.addData("Current position", currentY)
-								.addData("Final position", finalY)
-								.addData("Movement left", movementLeft);
-						telemetry.update();
+					telemetry.clear();
+					telemetry
+							.addData("Current position", currentY)
+							.addData("Final position", finalY)
+							.addData("Movement left", movementLeft);
+					telemetry.update();
 
-						if ((finalY < 0 && currentY <= finalY) || (finalY >= 0 && currentY >= finalY)) {
-							return true;
-						}
-
-						double power = normalizePower(initialPower, movementLeft, 0.33);
-						move(0, 0, power);
-						return false;
+					if ((finalY < 0 && currentY <= finalY) || (finalY >= 0 && currentY >= finalY)) {
+						return true;
 					}
+
+					double power = normalizePower(initialPower, movementLeft, 0.33);
+					move(0, 0, power);
+					return false;
 				},
-				this::stopMotors,
+				() -> {
+					stopMotors();
+					orientation.stopAccelerationIntegration();
+				},
 				5,
 				MILLISECONDS
 		);
