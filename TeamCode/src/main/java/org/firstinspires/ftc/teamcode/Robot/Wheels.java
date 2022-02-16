@@ -208,39 +208,32 @@ public class Wheels {
 			return null;
 		}
 
-		orientation.startAccelerationIntegration(new Position(), null, 2);
+		orientation.startAccelerationIntegration(new Position(), new Velocity(), 1);
 
-		double initialPower = Math.signum(meters) / 2;
+		double movement = meters * 1000;
+		double initialPower = Math.signum(movement) / 2;
 		Position initialPosition = orientation.getPosition();
-		DistanceUnit unit = initialPosition.unit;
-		double initialY = unit.toMeters(initialPosition.x);
-		double finalY = unit.toMeters(initialY) + meters;
-
-		telemetry.setAutoClear(false);
-		telemetry
-				.addData("Initial position", initialPosition)
-				.setRetained(true)
-				.addData("Initial power", initialPower)
-				.setRetained(true);
+		double initialX = initialPosition.unit.toMm(initialPosition.x);
+		double finalX = initialX + movement;
 
 		lastMovement = Utils.poll(
 				scheduler,
 				() -> {
-					double currentY = unit.toMeters(orientation.getPosition().x);
-					double movementLeft = Math.abs(finalY - currentY);
+					Position currentPosition = orientation.getPosition();
+					double currentX = currentPosition.unit.toMm(currentPosition.x);
+					double movementLeft = Math.abs(finalX - currentX);
 
-					telemetry.clear();
-					telemetry
-							.addData("Current position", currentY)
-							.addData("Final position", finalY)
-							.addData("Movement left", movementLeft);
-					telemetry.update();
-
-					if ((finalY < 0 && currentY <= finalY) || (finalY >= 0 && currentY >= finalY)) {
+					if ((finalX < 0 && currentX <= finalX) || (finalX >= 0 && currentX >= finalX)) {
 						return true;
 					}
 
-					double power = normalizePower(initialPower, movementLeft, 0.33);
+
+					double power = normalizePower(initialPower, movementLeft, 330);
+
+					telemetry.clearAll();
+					telemetry.addData("Current position", currentPosition).setRetained(true).addData("Power", power).setRetained(true);
+					telemetry.update();
+
 					move(0, 0, power);
 					return false;
 				},
