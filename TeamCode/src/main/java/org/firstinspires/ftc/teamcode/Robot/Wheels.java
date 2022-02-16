@@ -7,6 +7,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -21,12 +22,7 @@ import static com.qualcomm.robotcore.hardware.DcMotor.RunMode;
 import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior;
 
 public class Wheels {
-	private static final String[] HW_MOTOR_NAMES = {
-			"lf",
-			"lr",
-			"rf",
-			"rr"
-	};
+	private static final List<String> HW_MOTOR_NAMES = Arrays.asList("lf", "lr", "rf", "rr");
 
 	private final double encoderTicksPerSecond;
 	private final List<DcMotorEx> engines;
@@ -50,10 +46,7 @@ public class Wheels {
 		HardwareMap map = Objects.requireNonNull(params.hardwareMap, "Hardware map was not passed");
 		ArrayList<DcMotorEx> engines = new ArrayList<>();
 
-		for (String name : HW_MOTOR_NAMES) {
-			engines.add(getEngine(map, name));
-		}
-
+		HW_MOTOR_NAMES.forEach(name -> engines.add(getEngine(map, name)));
 
 		engines.get(0).setDirection(Direction.FORWARD);
 		engines.get(1).setDirection(Direction.FORWARD);
