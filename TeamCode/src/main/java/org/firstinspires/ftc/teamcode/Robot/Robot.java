@@ -1,19 +1,11 @@
-/*
- * coding to do list
- * - write code for the intake ramp
- * - implement the moving
- */
-
 package org.firstinspires.ftc.teamcode.Robot;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.*;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.*;
 
 import java.util.concurrent.*;
-import java.util.stream.*;
 
 public class Robot {
     private final DcMotor intakeMotor;
