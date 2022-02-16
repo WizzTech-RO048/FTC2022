@@ -94,16 +94,7 @@ public class Wheels {
 				y + x - r  // right rear
 		};
 
-		double highest = 0.0;
-
-		for (double d : input) {
-			double abs = Math.abs(d);
-			if (abs > highest) {
-				highest = abs;
-			}
-		}
-
-		highest = Math.max(highest, 1);
+		double highest = Arrays.stream(input).map(Math::abs).reduce(1, Math::max);
 
 		for (int i = 0; i < input.length; i++) {
 			input[i] /= highest;
