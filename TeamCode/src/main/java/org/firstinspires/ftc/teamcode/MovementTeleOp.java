@@ -14,6 +14,7 @@ public class MovementTeleOp extends OpMode {
     private ScheduledFuture<?> lastMovement = null;
 
     private double movementMeters = 0, lastMovementModification = 0;
+    private double lastStopTime = 0;
 
     @Override
     public void init() {
@@ -28,6 +29,7 @@ public class MovementTeleOp extends OpMode {
     @Override
     public void loop() {
         controlDistanceMovement();
+        controlWheelsStop();
     }
 
     private void controlDistanceMovement() {
@@ -48,5 +50,13 @@ public class MovementTeleOp extends OpMode {
         lastMovementModification = time;
 
         telemetry.addData("Meters to move", movementMeters);
+    }
+
+    private void controlWheelsStop() {
+        if (Utils.inVicinity(lastStopTime, time, 0.2) || !gamepad1.b) {
+            return;
+        }
+
+        robot.wheels.stop();
     }
 }
