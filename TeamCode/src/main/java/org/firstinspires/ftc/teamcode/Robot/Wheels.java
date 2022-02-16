@@ -171,7 +171,7 @@ public class Wheels {
 							return true;
 						}
 
-						move(0, normalizePower(initialPower, rotation, 60 /* degrees */), 0);
+						move(0, normalizeRotationPower(initialPower, rotation), 0);
 						return false;
 					}
 				},
@@ -252,12 +252,13 @@ public class Wheels {
 		return Utils.clamp(val, -1, 1);
 	}
 
-	private static double normalizePower(double initialPower, double movementLeft, double threshold) {
-		if (movementLeft > threshold) {
+	private static double normalizeRotationPower(double initialPower, double degrees) {
+		final double THRESHOLD = 60;
+		if (degrees > THRESHOLD) {
 			return initialPower;
 		}
 
-		return Utils.interpolate(initialPower, Math.signum(initialPower) * 0.05, (threshold - movementLeft) / threshold, 1.1);
+		return Utils.interpolate(initialPower, Math.signum(initialPower) * 0.05, (THRESHOLD - degrees) / THRESHOLD, 1.1);
 	}
 
 	static class Parameters {
