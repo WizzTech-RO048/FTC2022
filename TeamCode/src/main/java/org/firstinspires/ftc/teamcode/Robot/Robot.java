@@ -18,11 +18,6 @@ import java.util.stream.*;
 public class Robot {
     private final DcMotor intakeMotor;
 
-    private final DcMotor leftFront;
-    private final DcMotor leftRear;
-    private final DcMotor rightFront;
-    private final DcMotor rightRear;
-
     private final Servo carouselServo;
 
     public final Arm arm;
@@ -31,31 +26,15 @@ public class Robot {
 
     private final Telemetry telemetry;
 
-    private BNO055IMU imu;
-    private double headingOffset = 0.0;
-    private Orientation angles;
-    private Acceleration gravity;
-
-    private boolean turbo = false;
-
     // private static final int SCISSORS_ARM_FINAL_POS = 12525;
     private static final int SCISSORS_ARM_FINAL_POS = 4300;
 
     public Robot(final HardwareMap hardwareMap, final Telemetry t, ScheduledExecutorService scheduler) {
         telemetry = t;
 
-        leftFront = hardwareMap.dcMotor.get("lf");
-        leftRear = hardwareMap.dcMotor.get("rf");
-        rightFront = hardwareMap.dcMotor.get("lr");
-        rightRear = hardwareMap.dcMotor.get("rr");
-        intakeMotor = hardwareMap.dcMotor.get("intakeMotor");
-
         carouselServo = hardwareMap.servo.get("duckWheel");
 
-        leftFront.setDirection(DcMotorSimple.Direction.FORWARD);
-        leftRear.setDirection(DcMotorSimple.Direction.FORWARD);
-        rightFront.setDirection(DcMotorSimple.Direction.FORWARD);
-        rightRear.setDirection(DcMotorSimple.Direction.FORWARD);
+        intakeMotor = hardwareMap.dcMotor.get("intakeMotor");
         intakeMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
         BNO055IMU orientation = hardwareMap.get(BNO055IMU.class, "imu");
@@ -83,33 +62,6 @@ public class Robot {
         sensorsParameters.scheduler = scheduler;
         sensorsParameters.telemetry = telemetry;
         sensors = new Sensors(sensorsParameters);
-    }
-
-    private void setMotors(double lf, double lr, double rf, double rr) {
-        final double scale = Stream.of(1.0, lf, lr, rf, rr).mapToDouble(Math::abs).max().getAsDouble();
-
-        leftFront.setPower(getPower(lf, scale, "front left"));
-        leftRear.setPower(getPower(lr, scale, "rear left"));
-        rightFront.setPower(getPower(rf, scale, "front right"));
-        rightRear.setPower(getPower(rr, scale, "rear right"));
-    }
-
-    private double getPower(double rf, double scale, String engine) {
-        telemetry.addData(String.format("Power in %s", engine), "initial: %f; turbo: %b; scale: %f", rf, turbo, scale);
-        return rf / (isTurbo() ? 1.0 : 2.0) / scale;
-    }
-
-    // motor parameters
-    public boolean isTurbo() {
-        return turbo;
-    }
-
-    public void setTurbo(boolean value) {
-        turbo = value;
-    }
-
-    public void stopMotors() {
-        setMotors(0, 0, 0, 0);
     }
 
     // ------------------------

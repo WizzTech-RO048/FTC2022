@@ -49,7 +49,6 @@ public class MainTeleOp extends OpMode {
     public void stop() {
         robot.wheels.stop();
         robot.arm.stopArm();
-        robot.stopMotors();
         if (lastArmRaised != null) {
             lastArmRaised.cancel(true);
         }
