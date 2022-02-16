@@ -204,20 +204,10 @@ public class Wheels {
 				() -> {
 					Position currentPosition = orientation.getPosition();
 					double currentX = currentPosition.unit.toMm(currentPosition.x);
-					double movementLeft = Math.abs(finalX - currentX);
 
 					if ((finalX < 0 && currentX <= finalX) || (finalX >= 0 && currentX >= finalX)) {
 						return true;
 					}
-
-					telemetry.clearAll();
-					telemetry
-							.addData("Current position", currentPosition).setRetained(true)
-							.addData("Current X", currentX).setRetained(true)
-							.addData("Final X", finalX).setRetained(true)
-							.addData("Movement left", movementLeft).setRetained(true)
-							.addData("Power", power).setRetained(true);
-					telemetry.update();
 
 					move(0, 0, power);
 					return false;
