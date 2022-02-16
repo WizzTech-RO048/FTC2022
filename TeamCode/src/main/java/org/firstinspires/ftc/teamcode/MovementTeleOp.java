@@ -27,19 +27,25 @@ public class MovementTeleOp extends OpMode {
 
     @Override
     public void loop() {
-        if (!Utils.inVicinity(lastMovementModification, time, 0.2)) {
-            if (gamepad1.dpad_up) {
-                movementMeters += 0.1;
-            } else if (gamepad1.dpad_down) {
-                movementMeters -= 0.1;
-            } else if (gamepad1.a && Utils.isDone(lastMovement)) {
-                lastMovement = robot.wheels.moveFor(movementMeters);
-            } else if (gamepad1.x) {
-                movementMeters = 0;
-            }
+        controlDistanceMovement();
+    }
 
-            lastMovementModification = time;
+    private void controlDistanceMovement() {
+        if (Utils.inVicinity(lastMovementModification, time, 0.2)) {
+            return;
         }
+
+        if (gamepad1.dpad_up) {
+            movementMeters += 0.1;
+        } else if (gamepad1.dpad_down) {
+            movementMeters -= 0.1;
+        } else if (gamepad1.x) {
+            movementMeters = 0;
+        } else if (gamepad1.a && Utils.isDone(lastMovement)) {
+            lastMovement = robot.wheels.moveFor(movementMeters);
+        }
+
+        lastMovementModification = time;
 
         telemetry.addData("Meters to move", movementMeters);
     }
