@@ -238,7 +238,7 @@ public class Wheels {
                 case RIGHT:
                     return "Right";
                 default:
-                    return "mort in cada";
+                    return "None";
             }
         }
     }
