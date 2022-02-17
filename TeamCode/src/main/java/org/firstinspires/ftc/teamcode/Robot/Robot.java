@@ -7,6 +7,7 @@
 package org.firstinspires.ftc.teamcode.Robot;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -32,7 +33,7 @@ public class Robot {
 	private final DcMotor rightFront;
 	private final DcMotor rightRear;
 
-	private final Servo carouselServo;
+	public final Servo carouselServo;
 
 	public final Arm arm;
 	public final Wheels wheels;
@@ -60,6 +61,7 @@ public class Robot {
 	    intakeMotor = hardwareMap.dcMotor.get("intakeMotor");
 
 		carouselServo = hardwareMap.servo.get("duckWheel");
+		// carouselServo.setDirection(CRServo.Direction.FORWARD);
 
 		leftFront.setDirection(DcMotorSimple.Direction.FORWARD);
 	    leftRear.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -131,9 +133,7 @@ public class Robot {
 		setMotors(factorSin, factorCos, factorCos, factorSin);
 	}
 
-	// TODO: write the functions for the robot to move easily and carefully
 	// autonomous movement
-
 	public void forward(){
 		wheels.move(0.0, 0.0, 1.0);
 		// int engine1 = wheels.engines.get(0).getCurrentPosition();
@@ -186,9 +186,8 @@ public class Robot {
 	// ------------------------
 	// - Carousel servo
 	// ------------------------
-	public void duckServoOn(){ carouselServo.setPosition(-1.0); }
+	public void duckServoOn(){ carouselServo.setPosition(1); }
 	public void duckServoOff(){ carouselServo.setPosition(0.5); }
-
 
 	// ------------------------
 	// - Sensors functions
