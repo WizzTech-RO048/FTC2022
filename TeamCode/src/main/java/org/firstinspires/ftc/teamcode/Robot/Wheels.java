@@ -85,11 +85,7 @@ public class Wheels {
 
 		double highest = Arrays.stream(input).map(Math::abs).reduce(1, Math::max);
 
-		for (int i = 0; i < input.length; i++) {
-			input[i] /= highest;
-		}
-
-		IntStream.range(0, input.length).forEach(i -> setPower(engines.get(i), input[i]));
+		IntStream.range(0, input.length).forEach(i -> setPower(engines.get(i), input[i] / highest));
 	}
 
 
