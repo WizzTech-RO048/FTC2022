@@ -25,7 +25,7 @@ public class Wheels {
 	private static final List<String> HW_MOTOR_NAMES = Arrays.asList("lf", "lr", "rf", "rr");
 
 	private final double encoderTicksPerSecond;
-	private final List<DcMotorEx> engines;
+	private final List<DcMotorEx> engines = new ArrayList<>();
 
 	private final BNO055IMU orientation;
 	private final Telemetry telemetry;
@@ -39,26 +39,19 @@ public class Wheels {
 	}
 
 	Wheels(@NonNull final Parameters params) {
-		this.telemetry = Objects.requireNonNull(params.telemetry, "Telemetry object was not set");
-		this.orientation = Objects.requireNonNull(params.orientationSensor, "Orientation sensor was not set");
-		this.scheduler = Objects.requireNonNull(params.scheduler, "Scheduler was not set");
+		telemetry = Objects.requireNonNull(params.telemetry, "Telemetry object was not set");
+		orientation = Objects.requireNonNull(params.orientationSensor, "Orientation sensor was not set");
+		scheduler = Objects.requireNonNull(params.scheduler, "Scheduler was not set");
 
 		HardwareMap map = Objects.requireNonNull(params.hardwareMap, "Hardware map was not passed");
-		ArrayList<DcMotorEx> engines = new ArrayList<>();
 
 		HW_MOTOR_NAMES.forEach(name -> engines.add(getEngine(map, name)));
 
-		engines.get(0).setDirection(Direction.FORWARD);
-		engines.get(1).setDirection(Direction.FORWARD);
-		engines.get(2).setDirection(Direction.FORWARD);
-
-		this.engines = engines;
-
 		if (params.encoderResolution != 0 && params.rpm != 0) {
-			this.encoderTicksPerSecond = (params.rpm / 60) * params.encoderResolution;
+			encoderTicksPerSecond = (params.rpm / 60) * params.encoderResolution;
 			useEncoders(true);
 		} else {
-			this.encoderTicksPerSecond = 0;
+			encoderTicksPerSecond = 0;
 			useEncoders(false);
 		}
 
