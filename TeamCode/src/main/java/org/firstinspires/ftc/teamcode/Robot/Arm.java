@@ -13,88 +13,70 @@ import java.util.Objects;
 import java.util.concurrent.*;
 
 public class Arm {
-	private final Telemetry telemetry;
-	private final ScheduledExecutorService scheduler;
+    private final Telemetry telemetry;
+    private final ScheduledExecutorService scheduler;
 
-	private final DcMotorEx arm;
-	private final Servo throwServo;
+    private final DcMotorEx arm;
+    private final Servo throwServo;
 
-	private final int armRaisedPosition;
-	public boolean isArmRaised = false;
+    private final int armRaisedPosition;
 
-	public int TargetPos;
+    Arm(@NonNull final Parameters parameters) {
+        arm = Objects.requireNonNull(parameters.arm, "Scissors arm is not set");
+        arm.setDirection(DcMotorSimple.Direction.REVERSE);
+        arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-	public boolean brakes = true;
+        throwServo = Objects.requireNonNull(parameters.throwServo, "throw servo is not set");
+        throwServo.setDirection(Servo.Direction.FORWARD);
 
-	Arm(@NonNull final Parameters parameters){
-		arm = Objects.requireNonNull(parameters.arm, "Scissors arm is not set");
-		arm.setDirection(DcMotorSimple.Direction.REVERSE);
-		arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-		arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        scheduler = Objects.requireNonNull(parameters.scheduler, "scheduler is not set");
+        telemetry = Objects.requireNonNull(parameters.telemetry, "Telemetry is not set");
 
-		throwServo = Objects.requireNonNull(parameters.throwServo, "throw servo is not set");
-		throwServo.setDirection(Servo.Direction.FORWARD);
+        armRaisedPosition = parameters.armRaisedPosition;
+    }
 
-		scheduler = Objects.requireNonNull(parameters.scheduler, "scheduler is not set");
-		telemetry = Objects.requireNonNull(parameters.telemetry, "Telemetry is not set");
+    private ScheduledFuture<?> lastMove = null, lastThrow = null;
 
-		armRaisedPosition = parameters.armRaisedPosition;
-	}
+    public ScheduledFuture<?> moveArm(double positionPercentage) {
+        if (!Utils.isDone(lastMove) && !lastMove.cancel(true)) {
+            return null;
+        }
 
-	// ------------------------
-	// - Arm moving functions
-	// ------------------------
-	private ScheduledFuture<?> lastMove = null, lastThrow = null;
-	public ScheduledFuture<?> moveArm(double positionPercentage){
-		brakes = false;
-		BrakeArm(brakes);
-		if(!Utils.isDone(lastMove) && !lastMove.cancel(true)){
-			telemetry.addLine("last move not done!");
+        int targetPosition = (int) Math.floor(Utils.interpolate(0, armRaisedPosition, positionPercentage, 1));
+        int initialPosition = arm.getCurrentPosition();
+
+        if (armRaisedPosition == initialPosition) {
 			return null;
-		}
+        }
 
-		int targetPosition = (int) Math.floor(Utils.interpolate(0, armRaisedPosition, positionPercentage, 1));
-		int initialPosition = arm.getCurrentPosition();
+        arm.setTargetPosition(targetPosition);
+        arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        arm.setPower(targetPosition > initialPosition ? 1 : -1);
 
-		TargetPos = targetPosition;
+        lastMove = Utils.poll(scheduler, () -> !arm.isBusy(), () -> arm.setPower(0), 10, TimeUnit.MILLISECONDS);
 
-		if (armRaisedPosition == initialPosition) {
-			brakes = true;
-			BrakeArm(brakes);
-			isArmRaised = true;
-			return null;
-		}
+        return lastMove;
+    }
 
-		arm.setTargetPosition(targetPosition);
-		arm. setMode(DcMotor.RunMode.RUN_TO_POSITION);
-		arm.setPower(targetPosition > initialPosition ? 1 : -1);
-
-		lastMove = Utils.pollIndex(scheduler, _i -> !arm.isBusy(), () -> arm.setPower(0), 10, TimeUnit.MILLISECONDS);
-
-		return lastMove;
-	}
-
-	public void stopArm(){
-		brakes = true;
-		BrakeArm(brakes);
-		isArmRaised = false;
+    public void stop() {
 		arm.setPower(0.0);
+    }
+
+    // rotating the cage
+	public void throwObject() {
+		throwServo.setPosition(1);
 	}
 
-	public int currentArmPosition(){ return arm.getCurrentPosition(); }
-	public void BrakeArm(boolean shouldUse) {
-		DcMotorEx.ZeroPowerBehavior behavior = shouldUse ? DcMotorEx.ZeroPowerBehavior.BRAKE : DcMotorEx.ZeroPowerBehavior.FLOAT;
-		arm.setZeroPowerBehavior(behavior);
+	public void retract() {
+		throwServo.setPosition(0.3);
 	}
 
-	// rotating the cage
-	public void rotateCage(double position){ throwServo.setPosition(position); }
-
-	static class Parameters{
-		DcMotorEx arm;
-		Servo throwServo;
-		Telemetry telemetry;
-		ScheduledExecutorService scheduler;
-		int armRaisedPosition;
-	}
+    static class Parameters {
+        DcMotorEx arm;
+        Servo throwServo;
+        Telemetry telemetry;
+        ScheduledExecutorService scheduler;
+        int armRaisedPosition;
+    }
 }
