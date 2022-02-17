@@ -17,9 +17,12 @@ class BarcodeDetectionState extends State {
 
     @Override
     public State update() {
+        robot.camera.printLocation();
+
         if (image == null) {
             robot.getTelemetry().addLine("No image is being processed, retrieving new frame...");
             image = robot.camera.getImage();
+
             return this;
         }
 
@@ -29,6 +32,7 @@ class BarcodeDetectionState extends State {
 
         try {
             robot.getTelemetry().addLine("Retrieved frame, detecting barcode...");
+
             return new BarcodeTestState(robot, BarcodeDetector.detect(image.get()));
         } catch (Exception e) {
             robot.getTelemetry().addData("Unhandled exception", e);

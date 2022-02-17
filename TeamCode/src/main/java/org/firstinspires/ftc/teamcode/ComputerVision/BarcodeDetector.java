@@ -43,8 +43,10 @@ public class BarcodeDetector {
     static Scalar maxBGR = new Scalar(150, 246, 255);
 
     public static Position detect(Bitmap input) {
-        Mat mat = new Mat(input.getHeight(), input.getWidth(), CvType.CV_8UC1);
-        Utils.bitmapToMat(input, mat);
+        Bitmap bmp = input.copy(Bitmap.Config.ARGB_8888, true);
+
+        Mat mat = new Mat(bmp.getHeight(), bmp.getWidth(), CvType.CV_8UC1);
+        Utils.bitmapToMat(bmp, mat);
 
         return getPosition(prepareFrame(mat));
     }

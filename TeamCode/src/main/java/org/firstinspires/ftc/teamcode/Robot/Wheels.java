@@ -314,7 +314,7 @@ public class Wheels {
         return Utils.clamp(val, -1, 1);
     }
 
-    private static double normalizeRotationPower(double initialPower, double degrees) {
+    public static double normalizeRotationPower(double initialPower, double degrees) {
         final double THRESHOLD = 60;
         if (degrees > THRESHOLD) {
             return initialPower;
