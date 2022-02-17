@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.Robot;
 
 import androidx.annotation.NonNull;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -10,7 +9,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-import java.lang.annotation.Target;
 import java.util.Objects;
 import java.util.concurrent.*;
 
@@ -71,7 +69,7 @@ public class Arm {
 		arm. setMode(DcMotor.RunMode.RUN_TO_POSITION);
 		arm.setPower(targetPosition > initialPosition ? 1 : -1);
 
-		lastMove = Utils.poll(scheduler, () -> !arm.isBusy(), () -> arm.setPower(0), 10, TimeUnit.MILLISECONDS);
+		lastMove = Utils.pollIndex(scheduler, _i -> !arm.isBusy(), () -> arm.setPower(0), 10, TimeUnit.MILLISECONDS);
 
 		return lastMove;
 	}
