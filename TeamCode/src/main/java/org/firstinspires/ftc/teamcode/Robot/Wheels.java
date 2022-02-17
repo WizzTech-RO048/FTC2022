@@ -6,18 +6,14 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import java.util.concurrent.*;
-import java.util.function.Supplier;
+import java.util.function.*;
 import java.util.stream.IntStream;
 
 import static java.util.concurrent.TimeUnit.*;
 
-import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode;
 import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior;
 
