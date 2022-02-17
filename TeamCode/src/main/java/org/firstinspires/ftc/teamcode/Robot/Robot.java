@@ -64,4 +64,14 @@ public class Robot {
     public void duckServoOff() {
         carouselServo.setPosition(0.5);
     }
+
+    public void stop() {
+        arm.retract();
+        duckServoOff();
+        stopIntake();
+    }
+
+    public Telemetry getTelemetry() {
+        return telemetry;
+    }
 }
