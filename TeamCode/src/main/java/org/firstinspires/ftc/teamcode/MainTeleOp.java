@@ -51,7 +51,6 @@ public class MainTeleOp extends OpMode {
 	public void stop() {
 		robot.wheels.stop();
 		robot.arm.stopArm();
-		robot.stopMotors();
 		if (lastArmRaised != null) {
 			lastArmRaised.cancel(true);
 		}
@@ -113,7 +112,7 @@ public class MainTeleOp extends OpMode {
 
 		robot.arm.isArmRaised = isZero(targetPosition);
 
-		if(targetPosition != 0.0 || targetPosition != 0.2) {
+		if(targetPosition != 0.0 && targetPosition != 0.2) {
 			lastArmRaised = robot.arm.moveArm(targetPosition);
 		}
 		// rotating the throwing servo
@@ -143,9 +142,9 @@ public class MainTeleOp extends OpMode {
 		if(controller1.dpadLeftOnce()){
 			dpadLeftPressed++;
 			if(dpadLeftPressed % 2 == 0){
-				robot.carouselServo.setPosition(0.8);
+				robot.duckServoOn();
 			} else{
-				robot.carouselServo.setPosition(0.5);
+				robot.duckServoOff();
 			}
 		}
 
@@ -155,7 +154,6 @@ public class MainTeleOp extends OpMode {
 		telemetry.addData("brakes status(on/off)", robot.arm.brakes);
 		telemetry.addData("is arm raised?", robot.arm.isArmRaised);
 		telemetry.addData("current arm position", currentArmPosition);
-		robot.wheels.returnMotorsValues();
 	}
 
 	private static boolean isZero(double value) {
