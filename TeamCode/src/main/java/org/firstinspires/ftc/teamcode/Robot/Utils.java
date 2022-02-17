@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.teamcode.Robot;
 
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Supplier;
+import java.util.concurrent.atomic.*;
+import java.util.function.*;
 
 public class Utils {
 	/**
@@ -35,18 +35,19 @@ public class Utils {
 	 * Check a condition until it is true at the given interval.
 	 *
 	 * @param scheduler The executor service to use for spawning the poll thread.
-	 * @param fn The condition.
+	 * @param fn The condition. This also takes the index of the current poll.
 	 * @param onEnd An action to run when the returned future is canceled or the condition is true and polling stops.
 	 * @param time The interval to poll the condition at.
 	 * @param unit The time unit of the interval.
 	 * @return A future that completes when the condition is true. Canceling this future will run the provided end action,
 	 * if necessary.
 	 */
-	public static ScheduledFuture<?> poll(ScheduledExecutorService scheduler, Supplier<Boolean> fn, Runnable onEnd, long time, TimeUnit unit) {
+	public static ScheduledFuture<?> pollIndex(ScheduledExecutorService scheduler, Predicate<Integer> fn, Runnable onEnd, long time, TimeUnit unit) {
 		AtomicBoolean endCalled = new AtomicBoolean();
+		AtomicInteger pollIndex = new AtomicInteger();
 
 		ScheduledFuture<?> f = scheduler.scheduleAtFixedRate(() -> {
-			if (!fn.get()) {
+			if (!fn.test(pollIndex.getAndIncrement())) {
 				return;
 			}
 			if (onEnd != null && endCalled.compareAndSet(false, true)) {
@@ -99,5 +100,9 @@ public class Utils {
 				return f.get(timeout, unit);
 			}
 		};
+	}
+
+	public static ScheduledFuture<?> poll(ScheduledExecutorService scheduler, Supplier<Boolean> fn, Runnable onEnd, long time, TimeUnit unit) {
+		return pollIndex(scheduler, _i -> fn.get(), onEnd, time, unit);
 	}
 }
