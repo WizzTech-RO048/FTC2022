@@ -168,33 +168,89 @@ public class Wheels {
 		return lastMovement;
 	}
 
-	public ScheduledFuture<?> moveFor(double meters, double power) {
-		if (Utils.inVicinity(meters, 0, 1e-4)) {
-			return null;
-		}
+    @FunctionalInterface
+    private interface PositionGetter extends Function<Position, Double> {}
+    @FunctionalInterface
+    private interface PositionChecker extends BiFunction<Double, Double, Boolean> {}
+	@FunctionalInterface
+	private interface MovementPowerGetter extends Function<Double, MovementPower> {}
 
+
+	public enum MoveDirection {
+		FORWARD(p -> p.unit.toMm(p.x), (c, e) -> c >= e, power -> new MovementPower(0, power, 0)),
+		BACKWARD(p -> p.unit.toMm(p.x), (c, e) -> c <= e, power -> new MovementPower(0, -power, 0)),
+		LEFT(p -> p.unit.toMm(p.y), (c, e) -> c <= e, power -> new MovementPower(-power, 0, 0)),
+		RIGHT(p -> p.unit.toMm(p.y), (c, e) -> c >= e, power -> new MovementPower(power, 0, 0));
+
+        private final PositionGetter positionGetter;
+        private final PositionChecker positionChecker;
+		private final MovementPowerGetter movementPowerGetter;
+        private final boolean isPositive;
+
+        MoveDirection(PositionGetter getter, PositionChecker checker, MovementPowerGetter powerGetter) {
+            positionGetter = getter;
+            positionChecker = checker;
+			movementPowerGetter = powerGetter;
+            isPositive = positionChecker.apply(2.0, 1.0);
+        }
+
+        public boolean hasReachedEnd(double current, double end) {
+            return positionChecker.apply(current, end);
+        }
+
+        public double getCoordinate(Position position) {
+            return positionGetter.apply(position);
+        }
+
+        public double getMovement(double meters) {
+			if (meters < 1e-3) {
+				throw new IllegalArgumentException("movement distance must be greater than 1mm");
+			}
+            double movement = meters * 1000; // convert to mm
+            if (isPositive) {
+                return movement;
+            }
+            return -movement; // the robot moves backward
+        }
+
+		public MovementPower getPower(double initialPower, double current, double end) {
+			if (initialPower < 1e-2) {
+				throw new IllegalArgumentException("movement power must be greater or equal to 1%");
+			}
+
+			return movementPowerGetter.apply(initialPower);
+		}
+	}
+
+	private static class MovementPower {
+		public final double x, y, r;
+
+		MovementPower(double x, double y, double r) {
+			this.x = x;
+			this.y = y;
+			this.r = r;
+		}
+	}
+
+	public ScheduledFuture<?> moveFor(double meters, double inputPower, @NonNull MoveDirection direction) {
 		if (isMoving() && !lastMovement.cancel(true)) {
 			return null;
 		}
 
 		orientation.startAccelerationIntegration(new Position(), new Velocity(), 1);
 
-		double movement = meters * 1000;
-		Position initialPosition = orientation.getPosition();
-		double initialX = initialPosition.unit.toMm(initialPosition.x);
-		double finalX = initialX + movement;
+        double movement = direction.getMovement(meters);
 
 		lastMovement = Utils.poll(
 				scheduler,
 				() -> {
-					Position currentPosition = orientation.getPosition();
-					double currentX = currentPosition.unit.toMm(currentPosition.x);
-
-					if ((finalX < 0 && currentX <= finalX) || (finalX >= 0 && currentX >= finalX)) {
+					double current = direction.getCoordinate(orientation.getPosition());
+					if (direction.hasReachedEnd(current, movement)) {
 						return true;
 					}
 
-					move(0, 0, power);
+					MovementPower power = direction.getPower(inputPower, current, movement);
+					move(power.x, power.y, power.r);
 					return false;
 				},
 				() -> {
