@@ -14,6 +14,7 @@ public class Robot {
 
     public final Arm arm;
     public final Wheels wheels;
+    public final Camera camera;
 
     private final Telemetry telemetry;
 
@@ -47,6 +48,8 @@ public class Robot {
         armParameters.scheduler = scheduler;
         armParameters.armRaisedPosition = SCISSORS_ARM_FINAL_POS;
         arm = new Arm(armParameters);
+
+        camera = new Camera(hardwareMap, telemetry);
     }
 
     public void intake(double percentage) {
