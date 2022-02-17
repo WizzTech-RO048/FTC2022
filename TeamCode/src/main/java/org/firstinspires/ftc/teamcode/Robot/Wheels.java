@@ -18,179 +18,183 @@ import static com.qualcomm.robotcore.hardware.DcMotor.RunMode;
 import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior;
 
 public class Wheels {
-	private static final List<String> HW_MOTOR_NAMES = Arrays.asList("lf", "lr", "rf", "rr");
+    private static final List<String> HW_MOTOR_NAMES = Arrays.asList("lf", "lr", "rf", "rr");
 
-	private final double encoderTicksPerSecond;
-	private final List<DcMotorEx> engines = new ArrayList<>();
+    private final double encoderTicksPerSecond;
+    private final List<DcMotorEx> engines = new ArrayList<>();
 
-	private final BNO055IMU orientation;
-	private final Telemetry telemetry;
+    private final BNO055IMU orientation;
+    private final Telemetry telemetry;
 
-	private final ScheduledExecutorService scheduler;
+    private final ScheduledExecutorService scheduler;
 
-	private static DcMotorEx getEngine(HardwareMap map, String name) {
-		DcMotorEx motor = map.get(DcMotorEx.class, name);
-		motor.setMode(RunMode.STOP_AND_RESET_ENCODER);
-		return motor;
-	}
+    private static DcMotorEx getEngine(HardwareMap map, String name) {
+        DcMotorEx motor = map.get(DcMotorEx.class, name);
+        motor.setMode(RunMode.STOP_AND_RESET_ENCODER);
+        return motor;
+    }
 
-	Wheels(@NonNull final Parameters params) {
-		telemetry = Objects.requireNonNull(params.telemetry, "Telemetry object was not set");
-		orientation = Objects.requireNonNull(params.orientationSensor, "Orientation sensor was not set");
-		scheduler = Objects.requireNonNull(params.scheduler, "Scheduler was not set");
+    Wheels(@NonNull final Parameters params) {
+        telemetry = Objects.requireNonNull(params.telemetry, "Telemetry object was not set");
+        orientation = Objects.requireNonNull(params.orientationSensor, "Orientation sensor was not set");
+        scheduler = Objects.requireNonNull(params.scheduler, "Scheduler was not set");
 
-		HardwareMap map = Objects.requireNonNull(params.hardwareMap, "Hardware map was not passed");
+        HardwareMap map = Objects.requireNonNull(params.hardwareMap, "Hardware map was not passed");
 
-		HW_MOTOR_NAMES.forEach(name -> engines.add(getEngine(map, name)));
+        HW_MOTOR_NAMES.forEach(name -> engines.add(getEngine(map, name)));
 
-		if (params.encoderResolution != 0 && params.rpm != 0) {
-			encoderTicksPerSecond = (params.rpm / 60) * params.encoderResolution;
-			useEncoders(true);
-		} else {
-			encoderTicksPerSecond = 0;
-			useEncoders(false);
-		}
+        if (params.encoderResolution != 0 && params.rpm != 0) {
+            encoderTicksPerSecond = (params.rpm / 60) * params.encoderResolution;
+            useEncoders(true);
+        } else {
+            encoderTicksPerSecond = 0;
+            useEncoders(false);
+        }
 
-		useBrakes(true);
-	}
+        useBrakes(true);
+    }
 
-	public void useEncoders(boolean shouldUse) {
-		RunMode mode = shouldUse ? RunMode.RUN_USING_ENCODER : RunMode.RUN_WITHOUT_ENCODER;
+    public void useEncoders(boolean shouldUse) {
+        RunMode mode = shouldUse ? RunMode.RUN_USING_ENCODER : RunMode.RUN_WITHOUT_ENCODER;
 
-		engines.forEach(engine -> engine.setMode(mode));
-	}
+        engines.forEach(engine -> engine.setMode(mode));
+    }
 
-	public void useBrakes(boolean shouldUse) {
-		ZeroPowerBehavior behavior = shouldUse ? ZeroPowerBehavior.BRAKE : ZeroPowerBehavior.FLOAT;
+    public void useBrakes(boolean shouldUse) {
+        ZeroPowerBehavior behavior = shouldUse ? ZeroPowerBehavior.BRAKE : ZeroPowerBehavior.FLOAT;
 
-		engines.forEach(engine -> engine.setZeroPowerBehavior(behavior));
-	}
+        engines.forEach(engine -> engine.setZeroPowerBehavior(behavior));
+    }
 
-	/**
-	 * @param x The throttle on the horizontal axis of the robot.
-	 * @param y The throttle on the vertical axis of the robot.
-	 * @param r The rotation power around the robot's axis.
-	 */
-	public void move(double x, double y, double r) {
-		x = normalize(x);
-		y = normalize(y);
-		r = normalize(r);
+    /**
+     * @param x The throttle on the horizontal axis of the robot.
+     * @param y The throttle on the vertical axis of the robot.
+     * @param r The rotation power around the robot's axis.
+     */
+    public void move(double x, double y, double r) {
+        x = normalize(x);
+        y = normalize(y);
+        r = normalize(r);
 
-		double[] input = {
-				y + x + r, // left front
-				y - x + r, // left rear
-				y - x - r, // right front
-				y + x - r  // right rear
-		};
+        double[] input = {
+                y + x + r, // left front
+                y - x + r, // left rear
+                y - x - r, // right front
+                y + x - r  // right rear
+        };
 
-		double highest = Arrays.stream(input).map(Math::abs).reduce(1, Math::max);
+        double highest = Arrays.stream(input).map(Math::abs).reduce(1, Math::max);
 
-		IntStream.range(0, input.length).forEach(i -> setPower(engines.get(i), input[i] / highest));
-	}
+        IntStream.range(0, input.length).forEach(i -> setPower(engines.get(i), input[i] / highest));
+    }
 
 
-	private void setPower(DcMotorEx engine, double power) {
-		if (engine.getMode() == RunMode.RUN_USING_ENCODER) {
-			engine.setVelocity(Math.round(power * encoderTicksPerSecond));
-		} else {
-			engine.setPower(power);
-		}
-	}
+    private void setPower(DcMotorEx engine, double power) {
+        if (engine.getMode() == RunMode.RUN_USING_ENCODER) {
+            engine.setVelocity(Math.round(power * encoderTicksPerSecond));
+        } else {
+            engine.setPower(power);
+        }
+    }
 
-	private double getOrientation(boolean direction) {
-		Orientation o = orientation.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
-		double angle = o.thirdAngle > 0 ? o.thirdAngle : 360 + o.thirdAngle;
-		return direction ? angle : 360 - angle;
-	}
+    private double getOrientation(boolean direction) {
+        Orientation o = orientation.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
+        double angle = o.thirdAngle > 0 ? o.thirdAngle : 360 + o.thirdAngle;
+        return direction ? angle : 360 - angle;
+    }
 
-	private ScheduledFuture<?> lastMovement = null;
+    private ScheduledFuture<?> lastMovement = null;
 
-	private boolean isMoving() {
-		return !Utils.isDone(lastMovement);
-	}
+    private boolean isMoving() {
+        return !Utils.isDone(lastMovement);
+    }
 
-	/**
-	 * Rotates the robot for the given number of degrees.
-	 *
-	 * For positive values, the robot rotates counter-clockwise.
-	 * Provide negative values for clockwise rotation.
-	 *
-	 * Values are in degrees, not radians. The robot can rotate
-	 * multiple times around itself: for a value of 720, the robot
-	 * will rotate twice around its axis.
-	 *
-	 * @param degrees The number of degrees to rotate the robot.
-	 *
-	 * @return A future that completes when the rotation is complete.
-	 * Canceling this future will cancel the rotation, with the robot
-	 * stopping any movement immediately.
-	 */
-	public ScheduledFuture<?> rotateFor(double degrees) {
-		if (Utils.inVicinity(degrees, 0, 1e-4)) {
-			return null;
-		}
+    /**
+     * Rotates the robot for the given number of degrees.
+     *
+     * For positive values, the robot rotates counter-clockwise.
+     * Provide negative values for clockwise rotation.
+     *
+     * Values are in degrees, not radians. The robot can rotate
+     * multiple times around itself: for a value of 720, the robot
+     * will rotate twice around its axis.
+     *
+     * @param degrees The number of degrees to rotate the robot.
+     * @return A future that completes when the rotation is complete.
+     * Canceling this future will cancel the rotation, with the robot
+     * stopping any movement immediately.
+     */
+    public ScheduledFuture<?> rotateFor(double degrees) {
+        if (Utils.inVicinity(degrees, 0, 1e-4)) {
+            return null;
+        }
 
-		if (isMoving() && !lastMovement.cancel(true)) {
-			return null;
-		}
+        if (isMoving() && !lastMovement.cancel(true)) {
+            return null;
+        }
 
-		// Positive degrees - clockwise movement - negative power
-		// Negative degrees - counter-clockwise movement - positive power
-		double initialPower = -Math.signum(degrees);
-		boolean isPositiveDirection = initialPower < 0;
+        // Positive degrees - clockwise movement - negative power
+        // Negative degrees - counter-clockwise movement - positive power
+        double initialPower = -Math.signum(degrees);
+        boolean isPositiveDirection = initialPower < 0;
 
-		lastMovement = Utils.poll(
-				scheduler,
-				new Supplier<Boolean>() {
-					private double rotation = Math.abs(degrees);
-					private double prevOrientation = getOrientation(isPositiveDirection);
+        lastMovement = Utils.poll(
+                scheduler,
+                new Supplier<Boolean>() {
+                    private double rotation = Math.abs(degrees);
+                    private double prevOrientation = getOrientation(isPositiveDirection);
 
-					@Override
-					public Boolean get() {
-						double currentOrientation = getOrientation(isPositiveDirection);
-						double delta = currentOrientation - prevOrientation;
-						prevOrientation = currentOrientation;
-						rotation -= delta >= 0 ? delta : 360 + delta;
+                    @Override
+                    public Boolean get() {
+                        double currentOrientation = getOrientation(isPositiveDirection);
+                        double delta = currentOrientation - prevOrientation;
+                        prevOrientation = currentOrientation;
+                        rotation -= delta >= 0 ? delta : 360 + delta;
 
-						if (rotation < 0.5) {
-							return true;
-						}
+                        if (rotation < 0.5) {
+                            return true;
+                        }
 
-						move(0, normalizeRotationPower(initialPower, rotation), 0);
-						return false;
-					}
-				},
-				this::stopMotors,
-				5,
-				MILLISECONDS
-		);
+                        move(0, normalizeRotationPower(initialPower, rotation), 0);
+                        return false;
+                    }
+                },
+                this::stopMotors,
+                5,
+                MILLISECONDS
+        );
 
-		return lastMovement;
-	}
+        return lastMovement;
+    }
 
     @FunctionalInterface
-    private interface PositionGetter extends Function<Position, Double> {}
+    private interface PositionGetter extends Function<Position, Double> {
+    }
+
     @FunctionalInterface
-    private interface PositionChecker extends BiFunction<Double, Double, Boolean> {}
-	@FunctionalInterface
-	private interface MovementPowerGetter extends Function<Double, MovementPower> {}
+    private interface PositionChecker extends BiFunction<Double, Double, Boolean> {
+    }
+
+    @FunctionalInterface
+    private interface MovementPowerGetter extends Function<Double, MovementPower> {
+    }
 
 
-	public enum MoveDirection {
-		FORWARD(p -> p.unit.toMm(p.x), (c, e) -> c >= e, power -> new MovementPower(0, power, 0)),
-		BACKWARD(p -> p.unit.toMm(p.x), (c, e) -> c <= e, power -> new MovementPower(0, -power, 0)),
-		LEFT(p -> p.unit.toMm(p.y), (c, e) -> c <= e, power -> new MovementPower(-power, 0, 0)),
-		RIGHT(p -> p.unit.toMm(p.y), (c, e) -> c >= e, power -> new MovementPower(power, 0, 0));
+    public enum MoveDirection {
+        FORWARD(p -> p.unit.toMm(p.x), (c, e) -> c >= e, power -> new MovementPower(0, 0, power)),
+        BACKWARD(p -> p.unit.toMm(p.x), (c, e) -> c <= e, power -> new MovementPower(0, 0, -power)),
+        LEFT(p -> p.unit.toMm(p.y), (c, e) -> c <= e, power -> new MovementPower(power, 0, 0)),
+        RIGHT(p -> p.unit.toMm(p.y), (c, e) -> c <= e, power -> new MovementPower(-power, 0, 0));
 
         private final PositionGetter positionGetter;
         private final PositionChecker positionChecker;
-		private final MovementPowerGetter movementPowerGetter;
+        private final MovementPowerGetter movementPowerGetter;
         private final boolean isPositive;
 
         MoveDirection(PositionGetter getter, PositionChecker checker, MovementPowerGetter powerGetter) {
             positionGetter = getter;
             positionChecker = checker;
-			movementPowerGetter = powerGetter;
+            movementPowerGetter = powerGetter;
             isPositive = positionChecker.apply(2.0, 1.0);
         }
 
@@ -203,9 +207,9 @@ public class Wheels {
         }
 
         public double getMovement(double meters) {
-			if (meters < 1e-3) {
-				throw new IllegalArgumentException("movement distance must be greater than 1mm");
-			}
+            if (meters < 1e-3) {
+                throw new IllegalArgumentException("movement distance must be greater than 1mm");
+            }
             double movement = meters * 1000; // convert to mm
             if (isPositive) {
                 return movement;
@@ -213,110 +217,137 @@ public class Wheels {
             return -movement; // the robot moves backward
         }
 
-		public MovementPower getPower(double initialPower, double current, double end) {
-			if (initialPower < 1e-2) {
-				throw new IllegalArgumentException("movement power must be greater or equal to 1%");
-			}
+        public MovementPower getPower(double initialPower, double current, double end) {
+            if (initialPower < 1e-2) {
+                throw new IllegalArgumentException("movement power must be greater or equal to 1%");
+            }
 
-			return movementPowerGetter.apply(initialPower);
-		}
-	}
+            return movementPowerGetter.apply(initialPower);
+        }
 
-	private static class MovementPower {
-		public final double x, y, r;
 
-		MovementPower(double x, double y, double r) {
-			this.x = x;
-			this.y = y;
-			this.r = r;
-		}
-	}
+        @Override
+        public String toString() {
+            switch (this) {
+                case FORWARD:
+                    return "Forward";
+                case BACKWARD:
+                    return "Backward";
+                case LEFT:
+                    return "Left";
+                case RIGHT:
+                    return "Right";
+                default:
+                    return "mort in cada";
+            }
+        }
+    }
 
-	public ScheduledFuture<?> moveFor(double meters, double inputPower, @NonNull MoveDirection direction) {
-		if (isMoving() && !lastMovement.cancel(true)) {
-			return null;
-		}
+    private static class MovementPower {
+        public final double x, y, r;
 
-		orientation.startAccelerationIntegration(new Position(), new Velocity(), 1);
+        MovementPower(double x, double y, double r) {
+            this.x = x;
+            this.y = y;
+            this.r = r;
+        }
+
+        @Override
+        public String toString() {
+            return "MovementPower{" +
+                    "x=" + x +
+                    ", y=" + y +
+                    ", r=" + r +
+                    '}';
+        }
+    }
+
+    public ScheduledFuture<?> moveFor(double meters, double inputPower, @NonNull MoveDirection direction) {
+        if (isMoving() && !lastMovement.cancel(true)) {
+            return null;
+        }
+
+        orientation.startAccelerationIntegration(new Position(), new Velocity(), 1);
 
         double movement = direction.getMovement(meters);
 
-		lastMovement = Utils.poll(
-				scheduler,
-				() -> {
-					double current = direction.getCoordinate(orientation.getPosition());
-					if (direction.hasReachedEnd(current, movement)) {
-						return true;
-					}
+        lastMovement = Utils.poll(
+                scheduler,
+                () -> {
+                    double current = direction.getCoordinate(orientation.getPosition());
+                    if (direction.hasReachedEnd(current, movement)) {
+                        return true;
+                    }
 
-					MovementPower power = direction.getPower(inputPower, current, movement);
-					move(power.x, power.y, power.r);
-					return false;
-				},
-				() -> {
-					stopMotors();
-					orientation.stopAccelerationIntegration();
-				},
-				1,
-				MILLISECONDS
-		);
+                    MovementPower power = direction.getPower(inputPower, current, movement);
 
-		return lastMovement;
-	}
+                    move(power.x, power.y, power.r);
+                    return false;
+                },
+                () -> {
+                    stopMotors();
+                    orientation.stopAccelerationIntegration();
+                },
+                1,
+                MILLISECONDS
+        );
 
-	private void stopMotors() {
-		engines.forEach(engine -> setPower(engine, 0.0));
-	}
+        return lastMovement;
+    }
 
-	/**
-	 * Stop any movement or rotation of the robot.
-	 */
-	public void stop() {
-		if (isMoving() && lastMovement.cancel(true)) {
-			return;
-		}
+    private void stopMotors() {
+        engines.forEach(engine -> setPower(engine, 0.0));
+    }
 
-		stopMotors();
-	}
+    /**
+     * Stop any movement or rotation of the robot.
+     */
+    public void stop() {
+        if (isMoving() && lastMovement.cancel(true)) {
+            return;
+        }
 
-	private static double normalize(double val) {
-		return Utils.clamp(val, -1, 1);
-	}
+        stopMotors();
+    }
 
-	private static double normalizeRotationPower(double initialPower, double degrees) {
-		final double THRESHOLD = 60;
-		if (degrees > THRESHOLD) {
-			return initialPower;
-		}
+    private static double normalize(double val) {
+        return Utils.clamp(val, -1, 1);
+    }
 
-		return Utils.interpolate(initialPower, Math.signum(initialPower) * 0.05, (THRESHOLD - degrees) / THRESHOLD, 1.1);
-	}
+    private static double normalizeRotationPower(double initialPower, double degrees) {
+        final double THRESHOLD = 60;
+        if (degrees > THRESHOLD) {
+            return initialPower;
+        }
 
-	static class Parameters {
-		/**
-		 * The robot's hardware configuration.
-		 */
-		public HardwareMap hardwareMap = null;
-		/**
-		 * The telemetry instance to send data to.
-		 */
-		public Telemetry telemetry = null;
-		/**
-		 * The orientation sensor instance used when rotating.
-		 */
-		public BNO055IMU orientationSensor = null;
-		/**
-		 * The executor service to be used for polling the orientation sensor when rotating.
-		 */
-		public ScheduledExecutorService scheduler = null;
+        return Utils.interpolate(initialPower, Math.signum(initialPower) * 0.05, (THRESHOLD - degrees) / THRESHOLD, 1.1);
+    }
 
-		/**
-		 * The PPR of the engine's encoder.
-		 */
-		public double encoderResolution = 0;
-		/**
-		 * The rotations per minute of the engine.
-		 */
-		public double rpm = 0;
-	}
+    public static class Parameters {
+        /**
+         * The robot's hardware configuration.
+         */
+        public HardwareMap hardwareMap = null;
+        /**
+         * The telemetry instance to send data to.
+         */
+        public Telemetry telemetry = null;
+        /**
+         * The orientation sensor instance used when rotating.
+         */
+        public BNO055IMU orientationSensor = null;
+        /**
+         * The executor service to be used for polling the orientation sensor when rotating.
+         */
+        public ScheduledExecutorService scheduler = null;
+
+        /**
+         * The PPR of the engine's encoder.
+         */
+        public double encoderResolution = 0;
+        /**
+         * The rotations per minute of the engine.
+         */
+        public double rpm = 0;
+    }
 }
