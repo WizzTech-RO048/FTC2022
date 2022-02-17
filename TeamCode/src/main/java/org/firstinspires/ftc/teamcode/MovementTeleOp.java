@@ -16,7 +16,7 @@ public class MovementTeleOp extends OpMode {
 
     private double
             movementMeters = 0,
-            movementPower = 0.01,
+            movementPower = 0.1,
             lastMovementMetersModificationTime = 0,
             lastMovementPowerModificationTime = 0,
             lastMovementTime = 0;
@@ -36,6 +36,10 @@ public class MovementTeleOp extends OpMode {
     public void loop() {
         controlMovementMeters();
         controlMovementPower();
+
+        telemetry.addData("Movement meters", movementMeters).addData("Movement power", movementPower);
+        telemetry.update();
+
         controlMovement();
         controlWheelsStop();
     }
@@ -44,8 +48,8 @@ public class MovementTeleOp extends OpMode {
         if (wasRecentlyPressed(lastMovementMetersModificationTime)) {
             return;
         }
-        lastMovementMetersModificationTime = time;
 
+        lastMovementMetersModificationTime = time;
         if (gamepad1.right_bumper) {
             movementMeters += 0.1;
         } else if (gamepad1.left_bumper) {
@@ -53,38 +57,44 @@ public class MovementTeleOp extends OpMode {
         } else if (gamepad1.x) {
             movementMeters = 0;
         }
-
-        telemetry.addData("Movement meters", movementMeters);
     }
 
     private void controlMovementPower() {
-        double powerIncrement = gamepad1.right_trigger > 0.8 ? 0.1 : gamepad1.left_trigger > 0.8 ? -0.1 : 0;
-
-        if (wasRecentlyPressed(lastMovementPowerModificationTime) || powerIncrement == 0) {
+        if (wasRecentlyPressed(lastMovementPowerModificationTime)) {
             return;
         }
+
+        double powerIncrement = gamepad1.left_stick_button ? -0.1 : gamepad1.right_stick_button ? 0.1 : 0;
+        if (powerIncrement == 0) {
+            return;
+        }
+
         lastMovementPowerModificationTime = time;
-
-        movementPower = Utils.clamp(movementMeters + powerIncrement, -1, 1);
-
-        telemetry.addData("Movement power", movementPower);
+        movementPower = Utils.clamp(movementPower + powerIncrement, -1, 1);
     }
 
     private void controlMovement() {
-        if (wasRecentlyPressed(lastMovementTime) || !Utils.isDone(lastMovement)) {
+        if (wasRecentlyPressed(lastMovementTime) || !Utils.isDone(lastMovement) || movementMeters < 1e-3) {
             return;
         }
-        lastMovementTime = time;
 
-        Wheels.MoveDirection direction = FORWARD;
+        Wheels.MoveDirection direction;
         if (gamepad1.dpad_right) {
             direction = RIGHT;
         } else if (gamepad1.dpad_left) {
             direction = LEFT;
         } else if (gamepad1.dpad_down) {
             direction = BACKWARD;
+        } else if (gamepad1.dpad_up) {
+            direction = FORWARD;
+        } else {
+            return;
         }
 
+        lastMovementTime = time;
+        // Cele mai precise viteze:
+        // - laterale: 0.4
+        // - fata/spate: 0.3
         lastMovement = robot.wheels.moveFor(movementMeters, movementPower, direction);
     }
 
@@ -92,8 +102,8 @@ public class MovementTeleOp extends OpMode {
         if (wasRecentlyPressed(lastStopTime) || !gamepad1.b) {
             return;
         }
-        lastStopTime = time;
 
+        lastStopTime = time;
         robot.wheels.stop();
     }
 
