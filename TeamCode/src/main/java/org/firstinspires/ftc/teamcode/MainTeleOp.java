@@ -128,17 +128,8 @@ public class MainTeleOp extends OpMode {
 			}
 		}
 
-		/*
-
-		if(servoRotated){
-			servoRotated = false;
-			robot.arm.rotateCage(0.0);
-		}
-
-		*/
-
 		// ------------------------
-		// -  system
+		// -  Intake system
 		// ------------------------
 		if(leftTrigger == 0.0){ robot.intake(rightTrigger); }
 		if(rightTrigger == 0.0){ robot.intake(-leftTrigger); }
@@ -158,15 +149,12 @@ public class MainTeleOp extends OpMode {
 			}
 		}
 
-
-
 		// ------------------------
 		// - Printing stuff
 		// ------------------------
 		telemetry.addData("brakes status(on/off)", robot.arm.brakes);
 		telemetry.addData("is arm raised?", robot.arm.isArmRaised);
 		telemetry.addData("current arm position", currentArmPosition);
-		telemetry.addData("meanValue", robot.meanValue());
 		robot.wheels.returnMotorsValues();
 	}
 

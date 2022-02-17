@@ -84,18 +84,6 @@ public class Arm {
 	}
 
 	public int currentArmPosition(){ return arm.getCurrentPosition(); }
-
-	/* public ScheduledFuture<?> printArmPos(){
-		if(arm.getCurrentPosition() == 0.0 || arm.getCurrentPosition() < 0){
-			isArmRaised = false;
-			brakes = true;
-		}
-		telemetry.addData("current arm pos", arm.getCurrentPosition());
-		telemetry.addData("target pos", TargetPos);
-		lastMove = Utils.poll(scheduler, () -> !arm.isBusy(), () -> arm.setPower(0), 10, TimeUnit.MILLISECONDS);
-		return lastMove;
-	} */
-
 	public void BrakeArm(boolean shouldUse) {
 		DcMotorEx.ZeroPowerBehavior behavior = shouldUse ? DcMotorEx.ZeroPowerBehavior.BRAKE : DcMotorEx.ZeroPowerBehavior.FLOAT;
 		arm.setZeroPowerBehavior(behavior);
@@ -103,8 +91,6 @@ public class Arm {
 
 	// rotating the cage
 	public void rotateCage(double position){ throwServo.setPosition(position); }
-
-
 
 	static class Parameters{
 		DcMotorEx arm;
