@@ -7,10 +7,10 @@ import org.firstinspires.ftc.teamcode.Robot.Robot;
 
 import java.util.concurrent.Future;
 
-class BarcodeDetectionState extends State {
+class StateBarcodeDetect extends State {
     private Future<Bitmap> image;
 
-    BarcodeDetectionState(@NonNull Robot robot) {
+    StateBarcodeDetect(@NonNull Robot robot) {
         super(robot);
         robot.getTelemetry().addLine("Initialized barcode detection state");
     }
@@ -29,10 +29,10 @@ class BarcodeDetectionState extends State {
 
         try {
             robot.getTelemetry().addLine("Retrieved frame, detecting barcode...");
-            return new BarcodeTestState(robot, BarcodeDetector.detect(image.get()));
+            return new StateBarcodeTest(robot, BarcodeDetector.detect(image.get()));
         } catch (Exception e) {
             robot.getTelemetry().addData("Unhandled exception", e);
-            return new NoopState(robot);
+            return new StateNoop(robot);
         }
     }
 

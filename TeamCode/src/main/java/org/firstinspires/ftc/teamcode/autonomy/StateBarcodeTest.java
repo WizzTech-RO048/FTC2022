@@ -4,8 +4,8 @@ import androidx.annotation.NonNull;
 import org.firstinspires.ftc.teamcode.ComputerVision.BarcodeDetector;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
 
-class BarcodeTestState extends State {
-    BarcodeTestState(@NonNull Robot robot, BarcodeDetector.Position detectedPosition) {
+class StateBarcodeTest extends State {
+    StateBarcodeTest(@NonNull Robot robot, BarcodeDetector.Position detectedPosition) {
         super(robot);
         robot.getTelemetry().addData("Detected barcode position", detectedPosition).setRetained(true);
     }
@@ -13,7 +13,7 @@ class BarcodeTestState extends State {
     @Override
     public State update() {
         if (timePassed >= 5) {
-            return new BarcodeDetectionState(robot);
+            return new StateBarcodeDetect(robot);
         }
 
         return this;

@@ -3,8 +3,8 @@ package org.firstinspires.ftc.teamcode.autonomy;
 import androidx.annotation.NonNull;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
 
-class NoopState extends State {
-    NoopState(@NonNull Robot robot) {
+class StateNoop extends State {
+    StateNoop(@NonNull Robot robot) {
         super(robot);
     }
 

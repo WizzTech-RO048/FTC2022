@@ -36,6 +36,6 @@ public abstract class State {
     }
 
     public static State initial(HardwareMap hardwareMap, Telemetry telemetry) {
-        return new InitialState(hardwareMap, telemetry, Executors.newScheduledThreadPool(1));
+        return new StateInitial(hardwareMap, telemetry, Executors.newScheduledThreadPool(1));
     }
 }
