@@ -13,11 +13,8 @@ public class MainTeleOp extends OpMode {
     private Robot robot;
     private Controller controller1;
     private Controller controller2;
-    private Utils utils;
 
-    private ScheduledFuture<?> lastRotation = null, lastArmRaised = null, lastThrow = null;
-
-    private double targetPosition;
+    private ScheduledFuture<?> lastArmRaised = null;
 
     private int rbPressed = 0;
     private int dpadLeftPressed = 0;
@@ -41,9 +38,6 @@ public class MainTeleOp extends OpMode {
         if (lastArmRaised != null) {
             lastArmRaised.cancel(true);
         }
-        if (lastThrow != null) {
-            lastThrow.cancel(true);
-        }
 
         turbo = false;
 
@@ -56,48 +50,32 @@ public class MainTeleOp extends OpMode {
         controller1.update();
         controller2.update();
 
-        double x = utils.limitSpeed(gamepad1.left_stick_x);
-        double y = -utils.limitSpeed(gamepad1.right_stick_x);
-        double r = -utils.limitSpeed(gamepad1.left_stick_y);
+        double y = gamepad1.left_stick_x;
+        double x = -gamepad1.right_stick_x;
+        double r = -gamepad1.left_stick_y;
 
-        // enabling the boost
-        boolean leftBumber = controller1.leftBumber();
-        if(leftBumber){
-            x = 1.0;
-            y = 1.0;
-            r = 1.0;
+        if (x >= 0.7) {
+            x = 0.7;
+        }
+        if (y >= 0.7) {
+            y = 0.7;
+        }
+        if (r >= 0.7) {
+            r = 0.7;
         }
 
-        if (Utils.isDone(lastRotation)) {
-            if (isZero(x) && isZero(y) && isZero(r)) {
-                robot.wheels.stop();
-            } else {
-                robot.wheels.move(x, y, r);
-            }
+        double rightTrigger = controller1.rightTrigger;
+        double leftTrigger = controller1.leftTrigger;
+
+        if (isZero(x) && isZero(y) && isZero(r)) {
+            robot.wheels.stop();
+        } else {
+            robot.wheels.move(x, y, r);
         }
 
-        // controlling the intake system
-        if (controller1.leftTrigger == 0.0) { robot.intake(controller1.rightTrigger); }
-        if (controller1.rightTrigger == 0.0) { robot.intake(-controller1.leftTrigger); }
-
-        // controlling the duck servo
-        if (controller1.dpadLeftOnce()) {
-            dpadLeftPressed++;
-            if (dpadLeftPressed % 2 == 0) {
-                robot.duckServoOn();
-            } else {
-                robot.duckServoOff();
-            }
-        }
-
-        // controlling the arm
-        if (controller1.AOnce()) { targetPosition = 0.0; }
-        if (controller1.XOnce()) { targetPosition = 0.1; }
-        if (controller1.BOnce()) { targetPosition = 0.35; }
-        if (controller1.YOnce()) { targetPosition = 0.7; }
         controlArm();
 
-        // rotating the arm servo motor
+        // rotating the throwing servo
         if (controller1.rightBumberOnce()) {
             rbPressed++;
             if (rbPressed % 2 == 1) {
@@ -107,8 +85,25 @@ public class MainTeleOp extends OpMode {
             }
         }
 
-        // emergency stop button
-        if(controller1.startOnce()){ stop(); }
+        if (leftTrigger == 0.0) {
+            robot.intake(rightTrigger);
+        }
+        if (rightTrigger == 0.0) {
+            robot.intake(-leftTrigger);
+        }
+
+        if (controller1.startOnce()) {
+            stop();
+        } // emergency stop button
+
+        if (controller1.dpadLeftOnce()) {
+            dpadLeftPressed++;
+            if (dpadLeftPressed % 2 == 0) {
+                robot.duckServoOn();
+            } else {
+                robot.duckServoOff();
+            }
+        }
     }
 
     private void controlArm() {
@@ -117,7 +112,6 @@ public class MainTeleOp extends OpMode {
         }
 
         Arm.Position position;
-
         if (controller1.AOnce()) {
             position = null;
         } else if (controller1.XOnce()) {
@@ -129,6 +123,7 @@ public class MainTeleOp extends OpMode {
         } else {
             return;
         }
+
         lastArmRaised = robot.arm.raise(position);
     }
 
