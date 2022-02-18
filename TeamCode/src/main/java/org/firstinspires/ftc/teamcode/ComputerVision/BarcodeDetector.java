@@ -14,7 +14,7 @@ public class BarcodeDetector {
         MIDDLE(new Rect(new Point(620, 30), new Point(1240, 1050))),
         RIGHT(new Rect(new Point(1240, 30), new Point(1860, 1050)));
 
-        public final Rect roi;
+        private final Rect roi;
 
         Position(Rect roi) {
             this.roi = roi;
