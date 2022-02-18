@@ -31,7 +31,7 @@ public class MainTeleOp extends OpMode {
         controller1 = new Controller(gamepad1);
         controller2 = new Controller(gamepad2);
 
-        robot.arm.retract();
+        robot.arm.retractBox();
     }
 
     @Override
@@ -101,9 +101,9 @@ public class MainTeleOp extends OpMode {
         if (controller1.rightBumberOnce()) {
             rbPressed++;
             if (rbPressed % 2 == 1) {
-                robot.arm.throwObject();
+                robot.arm.throwObjectFromBox();
             } else {
-                robot.arm.retract();
+                robot.arm.retractBox();
             }
         }
 
