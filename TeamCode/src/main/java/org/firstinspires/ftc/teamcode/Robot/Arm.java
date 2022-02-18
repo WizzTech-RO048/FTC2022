@@ -39,7 +39,7 @@ public class Arm {
 
     private ScheduledFuture<?> lastMove = null;
 
-    public ScheduledFuture<?> moveArm(double positionPercentage) {
+    private ScheduledFuture<?> moveArm(double positionPercentage) {
         if (!Utils.isDone(lastMove) && !lastMove.cancel(true)) {
             return null;
         }
