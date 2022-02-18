@@ -1,27 +1,18 @@
 package org.firstinspires.ftc.teamcode.autonomy;
 
-import android.graphics.Bitmap;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import org.firstinspires.ftc.teamcode.ComputerVision.BarcodeDetector;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
-
-import java.util.concurrent.Future;
+import org.opencv.core.Mat;
 
 class StateBarcodeDetect extends State {
-    private final Future<Bitmap> image;
     private final BarcodeDetector.Position mockPosition;
 
     StateBarcodeDetect(@NonNull Robot robot, @Nullable BarcodeDetector.Position mockedPosition) {
         super(robot);
 
-        if (mockedPosition != null) {
-            mockPosition = mockedPosition;
-            image = null;
-        } else {
-            mockPosition = null;
-            image = robot.camera.getImage();
-        }
+        mockPosition = mockedPosition;
     }
 
     @Override
@@ -30,15 +21,12 @@ class StateBarcodeDetect extends State {
             return nextState(mockPosition);
         }
 
-        if (!image.isDone()) {
-            return this;
+        Mat image = new Mat();
+        if (robot.camera.getImage(image)) {
+            return nextState(BarcodeDetector.detect(image));
         }
 
-        try {
-            return nextState(BarcodeDetector.detect(image.get()));
-        } catch (Exception e) {
-            return new StateException(robot, e);
-        }
+        return new StateException(robot, new Exception("Failed to get image from camera"));
     }
 
     private State nextState(BarcodeDetector.Position position) {
@@ -46,6 +34,7 @@ class StateBarcodeDetect extends State {
             case LEFT:
             case MIDDLE:
             case RIGHT:
+                return new StateBarcodeDetectedRight(robot);
             default:
                 return new StateException(robot, new RuntimeException("No barcode position detected"));
         }
@@ -54,6 +43,5 @@ class StateBarcodeDetect extends State {
     @Override
     public void stop() {
         super.stop();
-        image.cancel(true);
     }
 }

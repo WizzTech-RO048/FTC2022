@@ -26,6 +26,7 @@ class StateRotate extends State {
 
     @Override
     public void stop() {
+        rotation.cancel(true);
         super.stop();
     }
 }

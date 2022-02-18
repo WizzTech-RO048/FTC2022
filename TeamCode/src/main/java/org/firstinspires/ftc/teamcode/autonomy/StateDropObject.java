@@ -29,9 +29,14 @@ class StateDropObject extends State {
             return this;
         }
 
-        if (time - throwStartTime < 0.5) {
+        if (time - throwStartTime < 1.5) {
             return this;
         }
+
+        robot.arm.retractBox();
+        robot.arm.raise(null);
+
+
 
         return previousState;
     }

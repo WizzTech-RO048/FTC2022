@@ -99,7 +99,7 @@ public class Wheels {
 
     private double getOrientation(boolean direction) {
         Orientation o = orientation.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
-        double angle = o.thirdAngle > 0 ? o.thirdAngle : 360 + o.thirdAngle;
+        double angle = o.secondAngle > 0 ? o.secondAngle : 360 + o.secondAngle;
         return direction ? angle : 360 - angle;
     }
 
@@ -146,10 +146,25 @@ public class Wheels {
 
                     @Override
                     public Boolean get() {
+                        telemetry.clearAll();
+
                         double currentOrientation = getOrientation(isPositiveDirection);
-                        double delta = currentOrientation - prevOrientation;
+                        double delta = prevOrientation - currentOrientation;
+
+                        Telemetry.Item item = telemetry
+                                .addData("Orientation", currentOrientation).setRetained(true)
+                                .addData("Previous orientation", prevOrientation).setRetained(true)
+                                .addData("Previous rotation", rotation).setRetained(true)
+                                .addData("Delta", delta).setRetained(true);
+
+                        delta = delta >= 0 ? delta : 360 + delta;
+
+                        item.addData("New Delta", delta).setRetained(true);
+                        rotation -= delta;
+                        item.addData("New rotation", rotation).setRetained(true);
+                        telemetry.update();
+
                         prevOrientation = currentOrientation;
-                        rotation -= delta >= 0 ? delta : 360 + delta;
 
                         if (rotation < 0.5) {
                             return true;
@@ -315,12 +330,11 @@ public class Wheels {
     }
 
     private static double normalizeRotationPower(double initialPower, double degrees) {
-        final double THRESHOLD = 60;
-        if (degrees > THRESHOLD) {
+        if (degrees > 60) {
             return initialPower;
         }
 
-        return Utils.interpolate(initialPower, Math.signum(initialPower) * 0.05, (THRESHOLD - degrees) / THRESHOLD, 1.1);
+        return Utils.interpolate(initialPower, Math.signum(initialPower) * 0.05, (60 - degrees) / 60, 1.1);
     }
 
     public static class Parameters {
