@@ -67,13 +67,16 @@ public class MainTeleOp extends OpMode {
         double rightTrigger = controller1.rightTrigger;
         double leftTrigger = controller1.leftTrigger;
 
-        if (isZero(x) && isZero(y) && isZero(r)) {
-            robot.wheels.stop();
-        } else {
-            robot.wheels.move(x, y, r);
+        if (Utils.isDone(lastRotation)) {
+            if (isZero(x) && isZero(y) && isZero(r)) {
+                robot.stop();
+            } else {
+                robot.wheels.move(x, y, r);
+            }
         }
 
         controlArm();
+        controlRotation();
 
         // rotating the throwing servo
         if (controller1.rightBumberOnce()) {
@@ -91,10 +94,6 @@ public class MainTeleOp extends OpMode {
         if (rightTrigger == 0.0) {
             robot.intake(-leftTrigger);
         }
-
-        if (controller1.startOnce()) {
-            stop();
-        } // emergency stop button
 
         if (controller1.dpadLeftOnce()) {
             dpadLeftPressed++;
@@ -125,6 +124,35 @@ public class MainTeleOp extends OpMode {
         }
 
         lastArmRaised = robot.arm.raise(position);
+    }
+
+    private double rotationDegrees = 0, lastRotationDegreesModiticationTime = 0;
+    private ScheduledFuture<?> lastRotation =  null;
+
+    private void controlRotation() {
+        if (!Utils.isDone(lastRotation) || Utils.inVicinity(lastRotationDegreesModiticationTime, time, 0.2)) {
+            return;
+        }
+
+        if (gamepad1.dpad_right) {
+            rotationDegrees += 10;
+            lastRotationDegreesModiticationTime = time;
+        } else if (gamepad1.dpad_left) {
+            rotationDegrees -= 10;
+            lastRotationDegreesModiticationTime = time;
+        }
+
+        telemetry.addData("Rotation", rotationDegrees);
+        telemetry.update();
+
+        if (!gamepad1.left_bumper) {
+            return;
+        }
+
+        telemetry.addLine("Rotating...");
+        telemetry.update();
+
+        lastRotation = robot.wheels.rotateFor(rotationDegrees);
     }
 
     private static boolean isZero(double value) {
