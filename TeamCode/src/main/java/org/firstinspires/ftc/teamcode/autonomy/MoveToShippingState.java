@@ -21,6 +21,7 @@ public class MoveToShippingState extends State {
 
 	@Override
 	public State update() {
+		/*
 		if(lastMovement.isDone()) {
 			step ++;
 
@@ -66,7 +67,9 @@ public class MoveToShippingState extends State {
 					return new NoopState(robot);
 			}
 		}
-
+		*/
 		return this;
+
 	}
+
 }

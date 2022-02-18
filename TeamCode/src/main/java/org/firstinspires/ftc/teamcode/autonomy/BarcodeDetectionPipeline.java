@@ -49,133 +49,24 @@ public class BarcodeDetectionPipeline extends OpenCvPipeline {
 		}
 	}
 
-	public Positions location;
+	private static Scalar minBGR = new Scalar(176, 153, 28);
+	private static Scalar maxBGR = new Scalar(255, 233, 1);
 
-	static Scalar minBGR = new Scalar(25, 146, 190);
-	static Scalar maxBGR = new Scalar(150, 246, 255);
+	private final Mat mask, dst;
 
-	public int width;
-
-	public BarcodeDetectionPipeline(int width) {
-		this.width = width;
-	}
-
-//	@Override
-//	public Mat processFrame(Mat input) {
-//		 //location = getPosition(prepareFrame(input));
-//		Imgproc.GaussianBlur(input, input, new Size(5, 5), 0);
-//
-//		Mat mask = new Mat(input.size(), CvType.CV_8U);
-//		Core.inRange(input, minBGR, maxBGR, mask);
-//
-//		// TODO: Check if mask is applied as desired
-//		Mat dst = new Mat(mask.size(), mask.type());
-//		Core.bitwise_and(input, input, mask, dst);
-//
-//		dst.copyTo(input);
-//
-//		mask.release();
-//
-//		 // Imgproc.rectangle(input, location.roi, new Scalar(255, 0, 0), 20);
-//
-//		 return input;
-//	}
-
-	public static Mat prepareFrame(Mat input) {
-		Imgproc.GaussianBlur(input, input, new Size(5, 5), 0);
-
-		Mat mask = new Mat(input.size(), CvType.CV_8U);
-		Core.inRange(input, minBGR, maxBGR, mask);
-
-		// TODO: Check if mask is applied as desired
-		Mat dst = new Mat(mask.size(), mask.type());
-		Core.bitwise_and(input, input, mask, dst);
-
-		mask.release();
-
-		return dst;
-	}
-
-	private static Positions getPosition(Mat input) {
-		// TODO: Check if this returns the correct position
-		Positions max = Arrays.stream(Positions.values()).max(Comparator.comparingInt(a -> a.getArea(input))).get();
-
-		if (max.getArea(input) == 0) {
-			return Positions.NONE;
-		}
-
-		input.release();
-
-		return max;
+	public BarcodeDetectionPipeline(int width, int height) {
+		mask = new Mat(height, width, CvType.CV_8U);
+		dst = new Mat(height, width, CvType.CV_8U);
 	}
 
 	@Override
 	public Mat processFrame(Mat input) {
-		Mat mat = new Mat();
-		Imgproc.cvtColor(input, mat, Imgproc.COLOR_BGR2HSV);
+		Core.inRange(input, minBGR, maxBGR, mask);
+		Core.bitwise_and(input, input, dst, mask);
 
-		if (mat.empty()) {
-			location = Positions.NONE;
-			return input;
-		}
+		Imgproc.rectangle(dst, Positions.LEFT.roi, minBGR, 20);
+		Imgproc.rectangle(dst, Positions.RIGHT.roi, maxBGR, 20);
 
-		// Scalar lowHSV = new Scalar(170, 170, 60);
-		Scalar lowHSV = new Scalar(170, 170, 60);
-		//Scalar highHSV = new Scalar(210, 210, 90);
-		Scalar highHSV = new Scalar(39, 100, 100);
-		Mat thresh = new Mat();
-
-		Imgproc.rectangle(mat, Positions.LEFT.roi, lowHSV, 20);
-		Imgproc.rectangle(mat, Positions.RIGHT.roi, highHSV, 20);
-
-		return mat;
-
-		// Core.inRange(mat, lowHSV, highHSV, thresh);
-
-		// return thresh;
-
-//		Mat edges = new Mat();
-//		Imgproc.Canny(thresh, edges, 100, 300);
-//
-//		edges.copyTo(input);
-//		return input;
-
-//		List<MatOfPoint> contours = new ArrayList<>();
-//		Mat hierarchy = new Mat();
-//		Imgproc.findContours(edges, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
-//
-//		MatOfPoint2f[] contoursPoly  = new MatOfPoint2f[contours.size()];
-//		Rect[] boundRect = new Rect[contours.size()];
-//		for (int i = 0; i < contours.size(); i++) {
-//			contoursPoly[i] = new MatOfPoint2f();
-//			Imgproc.approxPolyDP(new MatOfPoint2f(contours.get(i).toArray()), contoursPoly[i], 3, true);
-//			boundRect[i] = Imgproc.boundingRect(new MatOfPoint(contoursPoly[i].toArray()));
-//		}
-//
-//		double left_x = 0.25 * width;
-//		double right_x = 0.75 * width;
-//		boolean left = false; // true if regular stone found on the left side
-//		boolean right = false; // "" "" on the right side
-//		for (int i = 0; i != boundRect.length; i++) {
-//			if (boundRect[i].x < left_x)
-//				left = true;
-//			if (boundRect[i].x + boundRect[i].width > right_x)
-//				right = true;
-//
-//			Imgproc.rectangle(mat, boundRect[i], new Scalar(0.5, 76.9, 89.8));
-//		}
-//
-//		if (!left) location = Positions.LEFT;
-//		else if (!right) location = Positions.RIGHT;
-//		else location = Positions.NONE;
-//
-//		return mat; // return the mat with rectangles drawn
-	}
-
-	public Positions getLocation() {
-		if(location != null)
-			return location;
-		else
-			return Positions.NONE;
+		return dst;
 	}
 }

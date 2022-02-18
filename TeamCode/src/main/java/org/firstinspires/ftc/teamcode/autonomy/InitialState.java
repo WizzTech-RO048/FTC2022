@@ -14,7 +14,7 @@ class InitialState extends State {
 
     @Override
     public State update() {
-        // return new BarcodeDetectionState(robot);
-        return new MoveToShippingState(robot);
+        return new BarcodeDetectionState(robot);
+        // return new MoveToShippingState(robot);
     }
 }
