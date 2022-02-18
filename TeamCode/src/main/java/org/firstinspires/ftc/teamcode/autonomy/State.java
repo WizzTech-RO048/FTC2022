@@ -1,8 +1,10 @@
 package org.firstinspires.ftc.teamcode.autonomy;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.ComputerVision.BarcodeDetector;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
 
 import java.util.concurrent.Executors;
@@ -35,7 +37,7 @@ public abstract class State {
         robot.camera.stop();
     }
 
-    public static State initial(HardwareMap hardwareMap, Telemetry telemetry) {
-        return new StateInitial(hardwareMap, telemetry, Executors.newScheduledThreadPool(1));
+    public static State initial(HardwareMap hardwareMap, Telemetry telemetry, @Nullable BarcodeDetector.Position mockPosition) {
+        return new StateInitial(hardwareMap, telemetry, Executors.newScheduledThreadPool(1), mockPosition);
     }
 }

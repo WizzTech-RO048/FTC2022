@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.*;
+import org.firstinspires.ftc.teamcode.ComputerVision.BarcodeDetector;
 import org.firstinspires.ftc.teamcode.autonomy.State;
 
 @Autonomous
@@ -9,7 +10,7 @@ public class Autonomy extends OpMode {
 
     @Override
     public void init() {
-        state = State.initial(hardwareMap, telemetry);
+        state = State.initial(hardwareMap, telemetry, BarcodeDetector.Position.RIGHT);
     }
 
     @Override
