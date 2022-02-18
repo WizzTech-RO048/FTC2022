@@ -14,9 +14,7 @@ public class MainTeleOp extends OpMode {
     private Controller controller1;
     private Controller controller2;
 
-    private ScheduledFuture<?> lastRotation = null, lastArmRaised = null, lastThrow = null;
-
-    private double targetPosition;
+    private ScheduledFuture<?> lastArmRaised = null;
 
     private int rbPressed = 0;
     private int dpadLeftPressed = 0;
@@ -39,9 +37,6 @@ public class MainTeleOp extends OpMode {
         robot.arm.stop();
         if (lastArmRaised != null) {
             lastArmRaised.cancel(true);
-        }
-        if (lastThrow != null) {
-            lastThrow.cancel(true);
         }
 
         turbo = false;
@@ -71,37 +66,14 @@ public class MainTeleOp extends OpMode {
 
         double rightTrigger = controller1.rightTrigger;
         double leftTrigger = controller1.leftTrigger;
-        boolean leftBumber = controller1.leftBumber();
 
-        if (Utils.isDone(lastRotation)) {
-            if (isZero(x) && isZero(y) && isZero(r)) {
-                robot.wheels.stop();
-            } else {
-                robot.wheels.move(x, y, r);
-            }
+        if (isZero(x) && isZero(y) && isZero(r)) {
+            robot.wheels.stop();
+        } else {
+            robot.wheels.move(x, y, r);
         }
 
-        if (controller1.AOnce()) {
-            targetPosition = 0.0;
-        }
-        if (controller1.XOnce()) {
-            targetPosition = 0.1;
-        }
-        if (controller1.BOnce()) {
-            targetPosition = 0.3;
-        }
-        if (controller1.YOnce()) {
-            targetPosition = 0.6;
-        }
-
-        if (controller1.dpadUpOnce() && targetPosition <= 1.0) {
-            targetPosition += 0.1;
-        }
-        if (controller1.dpadDownOnce() && targetPosition >= 0.0) {
-            targetPosition -= 0.1;
-        }
-
-        lastArmRaised = robot.arm.moveArm(targetPosition);
+        controlArm();
 
         // rotating the throwing servo
         if (controller1.rightBumberOnce()) {
@@ -132,6 +104,27 @@ public class MainTeleOp extends OpMode {
                 robot.duckServoOff();
             }
         }
+    }
+
+    private void controlArm() {
+        if (!Utils.isDone(lastArmRaised)) {
+            return;
+        }
+
+        Arm.Position position;
+        if (controller1.AOnce()) {
+            position = null;
+        } else if (controller1.XOnce()) {
+            position = Arm.Position.BASE;
+        } else if (controller1.BOnce()) {
+            position = Arm.Position.MID;
+        } else if (controller1.YOnce()) {
+            position = Arm.Position.TOP;
+        } else {
+            return;
+        }
+
+        lastArmRaised = robot.arm.raise(position);
     }
 
     private static boolean isZero(double value) {
