@@ -69,7 +69,7 @@ public class Robot {
     }
 
     public void stop() {
-        arm.retract();
+        arm.retractBox();
         duckServoOff();
         stopIntake();
     }

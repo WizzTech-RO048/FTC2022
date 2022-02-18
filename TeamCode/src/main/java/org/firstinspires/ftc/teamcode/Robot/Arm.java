@@ -85,11 +85,11 @@ public class Arm {
     }
 
     // rotating the cage
-	public void throwObject() {
+	public void throwObjectFromBox() {
 		throwServo.setPosition(1);
 	}
 
-	public void retract() {
+	public void retractBox() {
 		throwServo.setPosition(0.3);
 	}
 
