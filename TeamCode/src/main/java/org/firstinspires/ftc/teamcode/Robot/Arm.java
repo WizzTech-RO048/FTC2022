@@ -37,7 +37,7 @@ public class Arm {
         armRaisedPosition = parameters.armRaisedPosition;
     }
 
-    private ScheduledFuture<?> lastMove = null, lastThrow = null;
+    private ScheduledFuture<?> lastMove = null;
 
     public enum Position {
         BASE(0.1),
@@ -83,6 +83,26 @@ public class Arm {
 
     public void stop() {
 		arm.setPower(0.0);
+    }
+
+    public enum Position {
+        BASE(0.1),
+        MID(0.3),
+        TOP(0.6);
+
+        private final double position;
+
+        Position(double position) {
+            this.position = position;
+        }
+    }
+
+    public ScheduledFuture<?> raise(@Nullable Position position) {
+        if (position != null) {
+            return moveArm(position.position);
+        }
+
+        return moveArm(0);
     }
 
     // rotating the cage
