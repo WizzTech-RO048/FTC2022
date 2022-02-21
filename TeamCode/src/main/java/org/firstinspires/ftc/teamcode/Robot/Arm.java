@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Robot;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -38,6 +39,19 @@ public class Arm {
 
     private ScheduledFuture<?> lastMove = null, lastThrow = null;
 
+    public enum Position {
+        BASE(0.1),
+        MID(0.3),
+        TOP(0.7);
+
+        private final double position;
+
+        Position(double position) {
+            this.position = position;
+        }
+    }
+
+
     public ScheduledFuture<?> moveArm(double positionPercentage) {
         if (!Utils.isDone(lastMove) && !lastMove.cancel(true)) {
             return null;
@@ -57,6 +71,14 @@ public class Arm {
         lastMove = Utils.poll(scheduler, () -> !arm.isBusy(), () -> arm.setPower(0), 10, TimeUnit.MILLISECONDS);
 
         return lastMove;
+    }
+
+    public ScheduledFuture<?> raise(@Nullable Position position) {
+        if (position != null) {
+            return moveArm(position.position);
+        }
+
+        return moveArm(0);
     }
 
     public void stop() {

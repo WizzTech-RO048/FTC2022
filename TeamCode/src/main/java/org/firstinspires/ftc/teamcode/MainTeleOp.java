@@ -73,6 +73,12 @@ public class MainTeleOp extends OpMode {
         double leftTrigger = controller1.leftTrigger;
         boolean leftBumber = controller1.leftBumber();
 
+//        if(leftBumber){
+//            x = 1.0;
+//            y = 1.0;
+//            r = 1.0;
+//        }
+
         if (Utils.isDone(lastRotation)) {
             if (isZero(x) && isZero(y) && isZero(r)) {
                 robot.wheels.stop();
@@ -94,16 +100,6 @@ public class MainTeleOp extends OpMode {
             targetPosition = 0.6;
         }
 
-        if (controller1.dpadUpOnce() && targetPosition <= 1.0) {
-            targetPosition += 0.1;
-        }
-        if (controller1.dpadDownOnce() && targetPosition >= 0.0) {
-            targetPosition -= 0.1;
-        }
-
-        lastArmRaised = robot.arm.moveArm(targetPosition);
-
-        // rotating the throwing servo
         if (controller1.rightBumberOnce()) {
             rbPressed++;
             if (rbPressed % 2 == 1) {
@@ -120,6 +116,14 @@ public class MainTeleOp extends OpMode {
             robot.intake(-leftTrigger);
         }
 
+        if (controller1.dpadLeftOnce()) {
+            robot.duckServoOn();
+        }
+
+        if(controller1.dpadRightOnce()){
+            robot.duckServoOff();
+        }
+
         if (controller1.startOnce()) {
             stop();
         } // emergency stop button
@@ -132,6 +136,29 @@ public class MainTeleOp extends OpMode {
                 robot.duckServoOff();
             }
         }
+
+        controlArm();
+    }
+
+    private void controlArm() {
+        if (!Utils.isDone(lastArmRaised)) {
+            return;
+        }
+
+        Arm.Position position;
+        if (controller1.AOnce()) {
+            position = null;
+        } else if (controller1.XOnce()) {
+            position = Arm.Position.BASE;
+        } else if (controller1.BOnce()) {
+            position = Arm.Position.MID;
+        } else if (controller1.YOnce()) {
+            position = Arm.Position.TOP;
+        } else {
+            return;
+        }
+
+        lastArmRaised = robot.arm.raise(position);
     }
 
     private static boolean isZero(double value) {

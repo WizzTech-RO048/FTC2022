@@ -99,7 +99,8 @@ public class Wheels {
 
     private double getOrientation(boolean direction) {
         Orientation o = orientation.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
-        double angle = o.thirdAngle > 0 ? o.thirdAngle : 360 + o.thirdAngle;
+
+        double angle = o.secondAngle > 0 ? o.secondAngle : 360 + o.secondAngle;
         return direction ? angle : 360 - angle;
     }
 
@@ -107,6 +108,56 @@ public class Wheels {
 
     private boolean isMoving() {
         return !Utils.isDone(lastMovement);
+    }
+
+    public void moveForTime(double x, double y, int millis) {
+        try {
+            move(x, y, 0);
+            Thread.sleep(millis);
+        } catch (Exception e) {
+            ;
+        }
+    }
+
+    public void rotateForTime(int millis, double power) {
+        try {
+            move(0, normalizeRotationPower(power, 10), 0);
+            Thread.sleep(millis);
+        } catch (Exception e) {
+            ;
+        }
+    }
+
+    /**
+     * Because of time related issues, this function is blocking. Am very sorry
+     *
+     * XOXO,
+     * Mihai
+     *
+     * @param degrees
+     * @param power
+     */
+    public void rotateFor2(double degrees, double power) {
+        if (Utils.inVicinity(degrees, 0, 1e-4)) {
+            return ;
+        }
+
+        double orientation = getOrientation(true);
+        double finalOrientation = (orientation + degrees) % 360;
+        double rotation = Math.abs(degrees);
+
+        move(0, normalizeRotationPower(power, rotation), 0);
+
+        while (Math.abs(getOrientation(true) - finalOrientation) > 5) {
+            telemetry.addData("Orientation: ", getOrientation(true));
+            telemetry.update();
+        }
+
+        stop();
+    }
+
+    public void rotateToOrientation(double orientation, double power) {
+        rotateFor2(orientation - getOrientation(true), power);
     }
 
     /**

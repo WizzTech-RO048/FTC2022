@@ -14,7 +14,7 @@ public class BarcodeDetector {
         MIDDLE(new Rect(new Point(620, 30), new Point(1240, 1050))),
         RIGHT(new Rect(new Point(1240, 30), new Point(1860, 1050)));
 
-        public final Rect roi;
+        private final Rect roi;
 
         Position(Rect roi) {
             this.roi = roi;
@@ -42,13 +42,11 @@ public class BarcodeDetector {
     static Scalar minBGR = new Scalar(25, 146, 190);
     static Scalar maxBGR = new Scalar(150, 246, 255);
 
-    public static Position detect(Bitmap input) {
-        Bitmap bmp = input.copy(Bitmap.Config.ARGB_8888, true);
+    public static Position detect(Mat input) {
+//        Mat mat = new Mat(input.getHeight(), input.getWidth(), CvType.CV_8UC1);
+//        Utils.bitmapToMat(input, mat);
 
-        Mat mat = new Mat(bmp.getHeight(), bmp.getWidth(), CvType.CV_8UC1);
-        Utils.bitmapToMat(bmp, mat);
-
-        return getPosition(prepareFrame(mat));
+        return getPosition(prepareFrame(input));
     }
 
     public static Mat prepareFrame(Mat input) {
@@ -59,7 +57,10 @@ public class BarcodeDetector {
 
         // TODO: Check if mask is applied as desired
         Mat dst = new Mat(mask.size(), mask.type());
-        Core.bitwise_and(input, input, mask, dst);
+        Core.bitwise_and(input, input, dst, mask);
+
+//        input.release();
+//        mask.release();
 
         return dst;
     }
@@ -67,7 +68,10 @@ public class BarcodeDetector {
     private static Position getPosition(Mat input) {
         // TODO: Check if this returns the correct position
         Position max = Arrays.stream(Position.values()).max(Comparator.comparingInt(a -> a.getArea(input))).get();
-        if (max.getArea(input) == 0) {
+        boolean hasArea = max.getArea(input) == 0;
+//        input.release();
+
+        if (hasArea) {
             return null;
         }
 
