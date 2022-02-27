@@ -61,7 +61,8 @@ public class Arm {
     }
 
     public void stop() {
-		arm.setPower(0.0);
+        retractBox();
+        raise(null);
     }
 
     public enum Position {
