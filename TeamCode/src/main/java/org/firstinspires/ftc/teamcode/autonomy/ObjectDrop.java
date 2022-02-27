@@ -2,47 +2,39 @@ package org.firstinspires.ftc.teamcode.autonomy;
 
 import androidx.annotation.NonNull;
 import org.firstinspires.ftc.teamcode.Robot.*;
+import org.firstinspires.ftc.teamcode.state.State;
 
 import java.util.concurrent.ScheduledFuture;
 
-class StateDropObject extends State {
-    private final ScheduledFuture<?> movement;
-    private final State previousState;
+final class ObjectDrop extends RobotComposableStateSource {
+    private final ScheduledFuture<?> raise;
 
     private double throwStartTime = 0;
 
-    StateDropObject(@NonNull Robot robot, Arm.Position position, State previous) {
+    ObjectDrop(@NonNull Robot robot, Arm.Position position) {
         super(robot);
-        movement = robot.arm.raise(position);
-        previousState = previous;
+        raise = robot.arm.raise(position);
     }
 
     @Override
-    public State update() {
-        if (!movement.isDone()) {
-            return this;
+    public boolean update() {
+        if (!raise.isDone()) {
+            return false;
         }
 
         if (throwStartTime == 0.0) {
             robot.arm.throwObjectFromBox();
             throwStartTime = time;
-            return this;
+            return false;
         }
 
         if (time - throwStartTime < 1.5) {
-            return this;
+            return false;
         }
 
         robot.arm.retractBox();
         robot.arm.raise(null);
 
-
-
-        return previousState;
-    }
-
-    @Override
-    public void stop() {
-        super.stop();
+        return true;
     }
 }

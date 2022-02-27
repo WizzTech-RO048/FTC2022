@@ -1,9 +1,6 @@
 package org.firstinspires.ftc.teamcode.ComputerVision;
 
-import android.graphics.Bitmap;
-import org.opencv.android.Utils;
 import org.opencv.core.*;
-
 import org.opencv.imgproc.Imgproc;
 
 import java.util.*;
@@ -43,9 +40,6 @@ public class BarcodeDetector {
     static Scalar maxBGR = new Scalar(150, 246, 255);
 
     public static Position detect(Mat input) {
-//        Mat mat = new Mat(input.getHeight(), input.getWidth(), CvType.CV_8UC1);
-//        Utils.bitmapToMat(input, mat);
-
         return getPosition(prepareFrame(input));
     }
 
@@ -55,21 +49,15 @@ public class BarcodeDetector {
         Mat mask = new Mat(input.size(), CvType.CV_8U);
         Core.inRange(input, minBGR, maxBGR, mask);
 
-        // TODO: Check if mask is applied as desired
         Mat dst = new Mat(mask.size(), mask.type());
         Core.bitwise_and(input, input, dst, mask);
-
-//        input.release();
-//        mask.release();
 
         return dst;
     }
 
     private static Position getPosition(Mat input) {
-        // TODO: Check if this returns the correct position
         Position max = Arrays.stream(Position.values()).max(Comparator.comparingInt(a -> a.getArea(input))).get();
         boolean hasArea = max.getArea(input) == 0;
-//        input.release();
 
         if (hasArea) {
             return null;

@@ -3,16 +3,19 @@ package org.firstinspires.ftc.teamcode.autonomy;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import org.firstinspires.ftc.teamcode.ComputerVision.BarcodeDetector;
+import org.firstinspires.ftc.teamcode.Robot.Arm;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
+import org.firstinspires.ftc.teamcode.Robot.Wheels;
+import org.firstinspires.ftc.teamcode.state.State;
 import org.opencv.core.Mat;
 
-class StateBarcodeDetect extends State {
+final class StateBarcodeDetect extends RobotState {
     private final BarcodeDetector.Position mockPosition;
 
-    StateBarcodeDetect(@NonNull Robot robot, @Nullable BarcodeDetector.Position mockedPosition) {
+    StateBarcodeDetect(@NonNull Robot robot, @Nullable BarcodeDetector.Position mockPosition) {
         super(robot);
 
-        mockPosition = mockedPosition;
+        this.mockPosition = mockPosition;
     }
 
     @Override
@@ -34,14 +37,14 @@ class StateBarcodeDetect extends State {
             case LEFT:
             case MIDDLE:
             case RIGHT:
-                return new StateBarcodeDetectedRight(robot);
+                return State.compose(
+                        () -> new Movement(robot, 0.25, 0.3, Wheels.MoveDirection.BACKWARD),
+                        () -> new Movement(robot, 0.7, 0.4, Wheels.MoveDirection.LEFT),
+                        () -> new ObjectDrop(robot, Arm.Position.TOP),
+                        () -> new Rotation(robot, 180)
+                ).build(() -> new StateActionCarousel(robot));
             default:
                 return new StateException(robot, new RuntimeException("No barcode position detected"));
         }
-    }
-
-    @Override
-    public void stop() {
-        super.stop();
     }
 }
