@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.ComputerVision;
 
-import android.graphics.Bitmap;
 import org.opencv.android.Utils;
 import org.opencv.core.*;
 
@@ -55,12 +54,8 @@ public class BarcodeDetector {
         Mat mask = new Mat(input.size(), CvType.CV_8U);
         Core.inRange(input, minBGR, maxBGR, mask);
 
-        // TODO: Check if mask is applied as desired
         Mat dst = new Mat(mask.size(), mask.type());
         Core.bitwise_and(input, input, dst, mask);
-
-//        input.release();
-//        mask.release();
 
         return dst;
     }
