@@ -105,4 +105,15 @@ public class Utils {
 	public static ScheduledFuture<?> poll(ScheduledExecutorService scheduler, Supplier<Boolean> fn, Runnable onEnd, long time, TimeUnit unit) {
 		return pollIndex(scheduler, _i -> fn.get(), onEnd, time, unit);
 	}
+
+	public double limitSpeed(double speed){
+		double limitedSpeed = speed;
+		if(speed > 0.0 && speed >= 0.7){
+			limitedSpeed = 0.7;
+		} else if(speed <= 0.0 && speed <= -0.7){
+			limitedSpeed = -0.7;
+		}
+		return limitedSpeed;
+	}
+
 }
