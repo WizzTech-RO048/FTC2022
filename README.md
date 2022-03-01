@@ -11,4 +11,4 @@ All the code is written in Java.
 
 ![Tema picture from the 2021-2022 remote regionals](images/team-photo-regionals.jpeg)
 
-<center style="font-style: italic;"> scrie cod. </center>>
+<center style="font-style: italic;"> scrie cod. </center>
