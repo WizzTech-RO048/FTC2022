@@ -2,7 +2,8 @@ package org.firstinspires.ftc.teamcode.autonomy;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import org.firstinspires.ftc.teamcode.ComputerVision.BarcodeDetector;
+//import org.firstinspires.ftc.teamcode.ComputerVision.BarcodeDetector;
+import org.firstinspires.ftc.teamcode.ComputerVision.DetectieBarcode;
 import org.firstinspires.ftc.teamcode.Robot.Arm;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
 import org.firstinspires.ftc.teamcode.Robot.Wheels;
@@ -20,14 +21,13 @@ final class StateBarcodeDetect extends RobotState {
     @Override
     public State update() {
 
-    //    if (mockPosition != null) {
-    //        return nextState(mockPosition);
-    //    }
+        if (pozitie_detectata != 0) {
+            return nextState(pozitie_detectata);
+        }
 
-     //   Mat image = new Mat();
-     //   if (robot.camera.getImage(image)) {
-     //       return nextState(BarcodeDetector.detect(image));
-     //   }
+
+      //  return nextState(DetectieBarcode.main_detector());
+
 
         return new StateException(robot, new Exception("error"));
     }

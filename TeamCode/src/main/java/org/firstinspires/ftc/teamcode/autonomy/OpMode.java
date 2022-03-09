@@ -1,13 +1,13 @@
 package org.firstinspires.ftc.teamcode.autonomy;
 
 import com.qualcomm.robotcore.eventloop.opmode.*;
-import org.firstinspires.ftc.teamcode.ComputerVision.BarcodeDetector;
+import org.firstinspires.ftc.teamcode.ComputerVision.DetectieBarcode;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
 import org.firstinspires.ftc.teamcode.state.State;
 
 import java.util.concurrent.Executors;
 
-@Autonomous(name = "Beta - New Autonomy")
+@Autonomous(name = "BETA New Autonomy")
 public class OpMode extends com.qualcomm.robotcore.eventloop.opmode.OpMode {
     private State state;
 
