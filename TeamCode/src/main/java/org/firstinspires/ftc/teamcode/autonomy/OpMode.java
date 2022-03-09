@@ -4,10 +4,11 @@ import com.qualcomm.robotcore.eventloop.opmode.*;
 import org.firstinspires.ftc.teamcode.ComputerVision.DetectieBarcode;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
 import org.firstinspires.ftc.teamcode.state.State;
+import org.openftc.easyopencv.OpenCvWebcam;
 
 import java.util.concurrent.Executors;
 
-@Autonomous(name = "BETA New Autonomy")
+@Autonomous(name = "BETA NEW Autonomy")
 public class OpMode extends com.qualcomm.robotcore.eventloop.opmode.OpMode {
     private State state;
 
