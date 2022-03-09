@@ -10,33 +10,33 @@ import org.firstinspires.ftc.teamcode.state.State;
 import org.opencv.core.Mat;
 
 final class StateBarcodeDetect extends RobotState {
-    private final BarcodeDetector.Position mockPosition;
+    int pozitie_detectata=0;
 
-    StateBarcodeDetect(@NonNull Robot robot, @Nullable BarcodeDetector.Position mockPosition) {
+    StateBarcodeDetect(@NonNull Robot robot) {
         super(robot);
 
-        this.mockPosition = mockPosition;
     }
 
     @Override
     public State update() {
-        if (mockPosition != null) {
-            return nextState(mockPosition);
-        }
 
-        Mat image = new Mat();
-        if (robot.camera.getImage(image)) {
-            return nextState(BarcodeDetector.detect(image));
-        }
+    //    if (mockPosition != null) {
+    //        return nextState(mockPosition);
+    //    }
 
-        return new StateException(robot, new Exception("Failed to get image from camera"));
+     //   Mat image = new Mat();
+     //   if (robot.camera.getImage(image)) {
+     //       return nextState(BarcodeDetector.detect(image));
+     //   }
+
+        return new StateException(robot, new Exception("error"));
     }
 
-    private State nextState(BarcodeDetector.Position position) {
-        switch (position) {
-            case LEFT:
-            case MIDDLE:
-            case RIGHT:
+    private State nextState(int pos) {
+        switch (pos) {
+            case 1:
+            case 2:
+            case 3:
                 return State.compose(
                         () -> new Movement(robot, 0.25, 0.3, Wheels.MoveDirection.BACKWARD),
                         () -> new Movement(robot, 0.7, 0.4, Wheels.MoveDirection.LEFT),
@@ -44,7 +44,7 @@ final class StateBarcodeDetect extends RobotState {
                         () -> new Rotation(robot, 180)
                 ).build(() -> new StateActionCarousel(robot));
             default:
-                return new StateException(robot, new RuntimeException("No barcode position detected"));
+                return new StateException(robot, new RuntimeException("!Nu a fost detectata o pozitie"));
         }
     }
 }

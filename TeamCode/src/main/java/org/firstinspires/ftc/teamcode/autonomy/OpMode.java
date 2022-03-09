@@ -7,13 +7,13 @@ import org.firstinspires.ftc.teamcode.state.State;
 
 import java.util.concurrent.Executors;
 
-@Autonomous(name = "Autonomy")
+@Autonomous(name = "Beta - New Autonomy")
 public class OpMode extends com.qualcomm.robotcore.eventloop.opmode.OpMode {
     private State state;
 
     @Override
     public void init() {
-        state = new StateBarcodeDetect(new Robot(hardwareMap, telemetry, Executors.newScheduledThreadPool(1)), BarcodeDetector.Position.RIGHT);
+        state = new StateBarcodeDetect(new Robot(hardwareMap, telemetry, Executors.newScheduledThreadPool(1)));
     }
 
     @Override
