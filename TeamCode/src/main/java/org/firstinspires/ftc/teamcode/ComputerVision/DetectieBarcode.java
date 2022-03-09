@@ -20,6 +20,8 @@ abstract public class DetectieBarcode extends LinearOpMode
     int detected_pos=0;
 
      public void detector(){
+         //asta e functia care face captura, deschide camera etc si deschide pipeline-ul PipelineProcesare()
+
          int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
          webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
          webcam.setPipeline(new PipelineProcesare());
@@ -40,6 +42,10 @@ abstract public class DetectieBarcode extends LinearOpMode
              }
          });
      }
+
+     //aici vreau sa procesez totul. Voi adauga probabil un contor si sa verific daca acel contor e mai mare decat 1 in functia processFrame.
+    //Ideea e ca eu vreau sa procesez o singura data si asta e singura abordare la care m-am putut gandi
+
 
      class PipelineProcesare extends OpenCvPipeline{
 

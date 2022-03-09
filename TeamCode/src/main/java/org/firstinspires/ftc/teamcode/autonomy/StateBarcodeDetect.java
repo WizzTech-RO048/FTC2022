@@ -26,7 +26,11 @@ final class StateBarcodeDetect extends RobotState {
         }
 
 
-      //  return nextState(DetectieBarcode.main_detector());
+        //nu vreau sa fac captura in acest fisier, as vrea ca atat procesarea cat si captura sa ia loc in ComputerVision/DetectieBarcode
+        //problema e ca am un conflict la functii. Asta vrea un return static, dar eu n-am de unde sa-o ofer ce vrea el ;)
+        //continuam in DetectieBarcode
+
+        return nextState(DetectieBarcode.detector());
 
 
         return new StateException(robot, new Exception("error"));
