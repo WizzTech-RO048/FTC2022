@@ -25,6 +25,9 @@ public class DetectieBarcode extends OpenCvPipeline{
 
     @Override
     public Mat processFrame(Mat input){
+        Imgproc.cvtColor(input, mat, Imgproc.COLOR_RGB2HSV);
+        Scalar lower_bound=new Scalar(20, 80, 80);
+        Scalar upper_bound=new Scalar(55, 255, 255);
 
         return mat;
     }
