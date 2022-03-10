@@ -32,6 +32,4 @@ public class DetectieBarcode extends OpenCvPipeline{
     public int getLocation(){
         return detected_pos;
     }
-
-
 }
