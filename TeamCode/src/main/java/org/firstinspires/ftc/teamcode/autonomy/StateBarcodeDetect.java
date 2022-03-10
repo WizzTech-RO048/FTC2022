@@ -1,47 +1,32 @@
 package org.firstinspires.ftc.teamcode.autonomy;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-//import org.firstinspires.ftc.teamcode.ComputerVision.BarcodeDetector;
 import org.firstinspires.ftc.teamcode.ComputerVision.DetectieBarcode;
 import org.firstinspires.ftc.teamcode.Robot.Arm;
 import org.firstinspires.ftc.teamcode.Robot.Camera;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
 import org.firstinspires.ftc.teamcode.Robot.Wheels;
 import org.firstinspires.ftc.teamcode.state.State;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.opencv.core.Mat;
-import org.opencv.core.Point;
-import org.opencv.core.Scalar;
-import org.opencv.imgproc.Imgproc;
-import org.openftc.easyopencv.OpenCvCamera;
-import org.openftc.easyopencv.OpenCvCameraFactory;
-import org.openftc.easyopencv.OpenCvCameraRotation;
-import org.openftc.easyopencv.OpenCvPipeline;
-import org.openftc.easyopencv.OpenCvWebcam;
-import org.opencv.core.Mat;
 
 final class StateBarcodeDetect extends RobotState {
-    int pozitie_detectata=0;
 
+    DetectieBarcode detector=new DetectieBarcode(robot.getTelemetry());
+    int pozitie_detectata=detector.getLocation();
 
     StateBarcodeDetect(@NonNull Robot robot) {
         super(robot);
-
     }
 
     @Override
     public State update(){
+        pozitie_detectata=detector.getLocation();
 
         if (pozitie_detectata != 0) {
-            return nextState(pozitie_detectata);
+            return nextStateDebug(pozitie_detectata);
         }
 
-        robot.camera.applyPipeline(new DetectieBarcode.PipelineProcesare());
+        robot.camera.applyPipeline(detector);
 
         return new StateException(robot, new Exception("eroare in StateBarcodeDetect, update()"));
     }
@@ -59,6 +44,23 @@ final class StateBarcodeDetect extends RobotState {
                 ).build(() -> new StateActionCarousel(robot));
             default:
                 return new StateException(robot, new RuntimeException("!Nu a fost detectata o pozitie"));
+        }
+    }
+
+
+    private State nextStateDebug(int pos){
+        switch (pos){
+            case 1:
+                robot.getTelemetry().addLine("Detected pos=1");
+                robot.getTelemetry().update();
+            case 2:
+                robot.getTelemetry().addLine("Detected pos=2");
+                robot.getTelemetry().update();
+            case 3:
+                robot.getTelemetry().addLine("Detected pos=3");
+                robot.getTelemetry().update();
+            default:
+                return new StateException(robot, new RuntimeException("Nu a fost detectata o pozitie (pos=0)"));
         }
     }
 }
