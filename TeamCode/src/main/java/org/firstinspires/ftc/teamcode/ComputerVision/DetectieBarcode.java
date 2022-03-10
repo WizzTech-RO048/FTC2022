@@ -47,7 +47,7 @@ abstract public class DetectieBarcode extends LinearOpMode
     //Ideea e ca eu vreau sa procesez o singura data si asta e singura abordare la care m-am putut gandi
 
 
-     class PipelineProcesare extends OpenCvPipeline{
+     public static class PipelineProcesare extends OpenCvPipeline{
 
          @Override
          public Mat processFrame(Mat input)

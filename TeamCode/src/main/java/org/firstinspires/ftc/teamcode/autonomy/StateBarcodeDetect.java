@@ -33,29 +33,17 @@ final class StateBarcodeDetect extends RobotState {
         super(robot);
 
     }
-    Camera webcam;
 
     @Override
     public State update(){
-
-
 
         if (pozitie_detectata != 0) {
             return nextState(pozitie_detectata);
         }
 
+        robot.camera.applyPipeline(new DetectieBarcode.PipelineProcesare());
 
-        webcam.setPipeline(new DetectieBarcode.PipelineProcesare());
-
-
-        //nu vreau sa fac captura in acest fisier, as vrea ca atat procesarea cat si captura sa ia loc in ComputerVision/DetectieBarcode
-        //problema e ca am un conflict la functii. Asta vrea un return static, dar eu n-am de unde sa-o ofer ce vrea el ;)
-        //continuam in DetectieBarcode
-
-     //   return nextState(DetectieBarcode.detector());
-
-
-        return new StateException(robot, new Exception("error"));
+        return new StateException(robot, new Exception("eroare in StateBarcodeDetect, update()"));
     }
 
     private State nextState(int pos) {
