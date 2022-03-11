@@ -51,6 +51,7 @@ public class Camera {
     }
 
 
+    // TODO: fix the function. It returns a false value.
     public boolean getImage(Mat mat) {
         return false;
     }

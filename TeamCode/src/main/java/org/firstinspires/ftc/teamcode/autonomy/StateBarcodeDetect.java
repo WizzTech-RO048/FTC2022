@@ -22,11 +22,15 @@ final class StateBarcodeDetect extends RobotState {
     public State update(){
         pozitie_detectata=detector.getLocation();
 
-        if (pozitie_detectata != 0) {
+        if (pozitie_detectata == 0) {
+            robot.getTelemetry().addLine("conditie acceptata");
+            robot.getTelemetry().update();
             return nextStateDebug(pozitie_detectata);
+        } else{
+            robot.getTelemetry().addLine("da, a intrat in else");
+            robot.getTelemetry().update();
+            robot.camera.applyPipeline(detector);
         }
-
-        robot.camera.applyPipeline(detector);
 
         return new StateException(robot, new Exception("eroare in StateBarcodeDetect, update()"));
     }
