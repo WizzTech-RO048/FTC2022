@@ -72,6 +72,7 @@ public class Robot {
         arm.retract();
         duckServoOff();
         stopIntake();
+        wheels.stop();
     }
 
     public Telemetry getTelemetry() {
