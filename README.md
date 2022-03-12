@@ -1,10 +1,10 @@
 # WizzTech 2021-2022 - Freight Frenzy
 
-# BETA Brench by Pavel Prodan
+# (Concept) BETA Brench by Pavel Prodan
 
-TODO: to be tested
+Latest Update: sunt scrise toate functiile de detectie, dar nu functioneaza, ori nu executa pipeline-ul, ori primim erori in executie la testare.
 
-Exista 2 versiuni: Pavel-new-autonomy si Pavel-autonomy-no-detection
+**Atentie!** Am identificat probleme in OPMode, apare eroarea "Expension Hub not responding", este posibil ca acest brench sa nu aiba FIX-ul lui Teo din brench-ul principal
 
-Autonomy-no-detection => Este noul update facut de Teo, cu state-uri de compose
-New-Autonomy este pe metoda veche, tot cu state-uri, dar fara compose
+Urmeaza sa dezvolt un nou concept software, de accea consider acest brench **deprecated** sau **discontinued**. Cel mai probabil nu voi mai reveni pe acest concept deoarece voi implementa un sistem de localizare in timp real si voi folosi LinearOP in autonomie, arhitectura de state-uri fiind inutila in acest context.
+
