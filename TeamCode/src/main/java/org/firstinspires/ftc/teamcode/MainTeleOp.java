@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.Robot.*;
 
 import java.util.concurrent.*;
 
-@TeleOp
+@TeleOp(name = "MainTeleOp")
 public class MainTeleOp extends OpMode {
     private Robot robot;
     private Controller controller1;
@@ -50,7 +50,7 @@ public class MainTeleOp extends OpMode {
         controller1.update();
         controller2.update();
 
-        double y = gamepad1.left_stick_x;
+        double y = gamepad1.left_stick_y;
         double x = -gamepad1.right_stick_x;
         double r = -gamepad1.left_stick_y;
 
