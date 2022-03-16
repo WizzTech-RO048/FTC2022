@@ -1,8 +1,8 @@
 /*
-* Aceasta autonomie a fost dezvoltata in cazul in care robotul este menit sa se miste doar cateva
+* This program does nothing.
 * */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Autonomies;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
