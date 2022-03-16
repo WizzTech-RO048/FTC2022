@@ -85,26 +85,6 @@ public class Arm {
 		arm.setPower(0.0);
     }
 
-    public enum Position {
-        BASE(0.1),
-        MID(0.3),
-        TOP(0.7);
-
-        private final double position;
-
-        Position(double position) {
-            this.position = position;
-        }
-    }
-
-    public ScheduledFuture<?> raise(@Nullable Position position) {
-        if (position != null) {
-            return moveArm(position.position);
-        }
-
-        return moveArm(0);
-    }
-
     // rotating the cage
 	public void throwObjectFromBox() {
 		throwServo.setPosition(1);
