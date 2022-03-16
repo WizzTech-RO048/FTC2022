@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.autonomy;
+package org.firstinspires.ftc.teamcode.States;
 
 import androidx.annotation.Nullable;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -33,7 +33,7 @@ class StateInitial extends State {
 
         }
         if(startPosition == StartPosition.Position.BLUE2){
-            
+
         }
 
         return new StateBarcodeDetectedRight(robot);

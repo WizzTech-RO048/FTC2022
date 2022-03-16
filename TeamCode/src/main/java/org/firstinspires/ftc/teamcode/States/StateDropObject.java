@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.autonomy;
+package org.firstinspires.ftc.teamcode.States;
 
 import androidx.annotation.NonNull;
 import org.firstinspires.ftc.teamcode.Robot.*;
@@ -24,7 +24,7 @@ class StateDropObject extends State {
 		}
 
 		if (throwStartTime == 0.0) {
-			robot.arm.throwObject();
+			robot.arm.throwObjectFromBox();
 			throwStartTime = time;
 			return this;
 		}
@@ -33,7 +33,7 @@ class StateDropObject extends State {
 			return this;
 		}
 
-		robot.arm.retract();
+		robot.arm.retractBox();
 		robot.arm.raise(null);
 
 
