@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.ComputerVision.BarcodeDetector;
+import org.firstinspires.ftc.teamcode.ComputerVision.StartPosition;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
 
 import java.util.concurrent.Executors;
@@ -37,7 +38,7 @@ public abstract class State {
         robot.camera.stop();
     }
 
-    public static State initial(HardwareMap hardwareMap, Telemetry telemetry, @Nullable BarcodeDetector.Position mockPosition) {
-        return new StateInitial(hardwareMap, telemetry, Executors.newScheduledThreadPool(1), mockPosition);
+    public static State initial(HardwareMap hardwareMap, Telemetry telemetry, @Nullable BarcodeDetector.Position mockPosition, @Nullable StartPosition.Position startPosition) {
+        return new StateInitial(hardwareMap, telemetry, Executors.newScheduledThreadPool(1), mockPosition, startPosition);
     }
 }
