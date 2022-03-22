@@ -9,7 +9,7 @@
 *   -> move forward
 * */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Autonomies;
 
 import com.qualcomm.robotcore.eventloop.opmode.*;
 import org.firstinspires.ftc.teamcode.ComputerVision.BarcodeDetector;
