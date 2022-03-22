@@ -89,7 +89,6 @@ public class Arm {
 	public void throwObjectFromBox() {
 		throwServo.setPosition(1);
 	}
-
 	public void retractBox() {
 		throwServo.setPosition(0.3);
 	}
