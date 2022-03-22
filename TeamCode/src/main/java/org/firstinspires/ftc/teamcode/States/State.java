@@ -19,7 +19,7 @@ public abstract class State {
     /** Seconds passed since this state was initialized. */
     protected double timePassed = 0;
 
-    State(@NonNull Robot robot) {
+    protected State(@NonNull Robot robot) {
         this.robot = robot;
     }
 

@@ -2,9 +2,10 @@ package org.firstinspires.ftc.teamcode.States;
 
 import androidx.annotation.NonNull;
 import org.firstinspires.ftc.teamcode.Robot.Robot;
+import org.firstinspires.ftc.teamcode.States.State;
 
-class StateException extends State {
-    StateException(@NonNull Robot robot, Exception e) {
+public class StateException extends State {
+    public StateException(@NonNull Robot robot, Exception e) {
         super(robot);
         robot.getTelemetry().addData("Unhandled exception", e);
     }
