@@ -1,23 +1,17 @@
-package org.firstinspires.ftc.teamcode.States;
+package org.firstinspires.ftc.teamcode.States.MovementStates;
 
 import androidx.annotation.NonNull;
 import org.firstinspires.ftc.teamcode.Robot.*;
+import org.firstinspires.ftc.teamcode.States.State;
 
 import java.util.concurrent.ScheduledFuture;
 
-class StateMove extends State {
+public class StateMove extends State {
 	private final ScheduledFuture<?> movement;
 	private final State previousState;
 	private final double timeout;
 
-	StateMove(@NonNull Robot robot, double meters, double power, Wheels.MoveDirection direction, State previous) {
-		super(robot);
-		movement = robot.wheels.moveFor(meters, power, direction);
-		previousState = previous;
-		timeout = 0;
-	}
-
-	StateMove(@NonNull Robot robot, double meters, double power, Wheels.MoveDirection direction, State previous, double timeout) {
+	public StateMove(@NonNull Robot robot, double meters, double power, Wheels.MoveDirection direction, State previous, double timeout) {
 		super(robot);
 		movement = robot.wheels.moveFor(meters, power, direction);
 		previousState = previous;
