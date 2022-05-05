@@ -1,4 +1,3 @@
-
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -8,7 +7,7 @@ import org.firstinspires.ftc.teamcode.Robot.*;
 
 import java.util.concurrent.*;
 
-@TeleOp
+@TeleOp(name="MainTeleOp")
 public class MainTeleOp extends OpMode {
     private Robot robot;
     private Controller controller1;
@@ -21,6 +20,7 @@ public class MainTeleOp extends OpMode {
 
     private int rbPressed = 0;
     private int dpadLeftPressed = 0;
+    private int dpadRightPressed = 0;
 
     boolean turbo = false;
 
@@ -56,9 +56,11 @@ public class MainTeleOp extends OpMode {
         controller1.update();
         controller2.update();
 
-        double x = utils.limitSpeed(gamepad1.left_stick_x);
-        double y = -utils.limitSpeed(gamepad1.right_stick_x);
-        double r = -utils.limitSpeed(gamepad1.left_stick_y);
+        double x = -gamepad1.left_stick_x;
+        double y = -gamepad1.right_stick_x;
+        double r = -gamepad1.left_stick_y;
+
+
 
         // enabling the boost
         boolean leftBumber = controller1.leftBumber();
@@ -84,7 +86,16 @@ public class MainTeleOp extends OpMode {
         if (controller1.dpadLeftOnce()) {
             dpadLeftPressed++;
             if (dpadLeftPressed % 2 == 0) {
-                robot.duckServoOn();
+                robot.duckServoRed();
+            } else {
+                robot.duckServoOff();
+            }
+        }
+
+        if (controller1.dpadRightOnce()) {
+            dpadRightPressed++;
+            if (dpadRightPressed % 2 == 0) {
+                robot.duckServoBlue();
             } else {
                 robot.duckServoOff();
             }
