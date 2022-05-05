@@ -60,8 +60,12 @@ public class Robot {
         intakeMotor.setPower(0.0);
     }
 
-    public void duckServoOn() {
+    public void duckServoRed() {
         carouselServo.setPosition(-1.0);
+    }
+
+    public void duckServoBlue() {
+        carouselServo.setPosition(1.0);
     }
 
     public void duckServoOff() {
