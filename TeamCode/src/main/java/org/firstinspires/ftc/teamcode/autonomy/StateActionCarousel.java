@@ -28,7 +28,7 @@ public class StateActionCarousel extends State {
 
 		if (servoActionTime == 0) {
 			servoActionTime = time;
-			robot.duckServoOn();
+			robot.duckServoRed();
 		}
 
 		if (time - servoActionTime > 5) {
