@@ -50,9 +50,9 @@ public class MainTeleOp extends OpMode {
         controller1.update();
         controller2.update();
 
-        double y = gamepad1.left_stick_y;
+        double y = gamepad1.left_stick_x;
         double x = -gamepad1.right_stick_x;
-        double r = -gamepad1.left_stick_y;
+        double r = -gamepad1.right_stick_y;
 
         if (x >= 0.7) {
             x = 0.7;
@@ -76,8 +76,10 @@ public class MainTeleOp extends OpMode {
         }
 
         controlArm();
-        controlRotation();
+//        controlRotation();
 
+
+        // TODO: add telemetry
         // rotating the throwing servo
         if (controller1.rightBumberOnce()) {
             rbPressed++;
@@ -87,6 +89,8 @@ public class MainTeleOp extends OpMode {
                 robot.arm.retractBox();
             }
         }
+
+
 
         if (leftTrigger == 0.0) {
             robot.intake(rightTrigger);
