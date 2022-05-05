@@ -19,7 +19,7 @@ import org.firstinspires.ftc.teamcode.ComputerVision.StartPosition;
 import org.firstinspires.ftc.teamcode.States.State;
 
 @Autonomous(name = "Red 1")
-@Disabled
+//@Disabled
 public class AutonomyRed1 extends OpMode {
     private State state;
 

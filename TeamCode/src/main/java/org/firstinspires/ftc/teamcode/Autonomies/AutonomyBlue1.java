@@ -18,8 +18,8 @@ import org.firstinspires.ftc.teamcode.ComputerVision.BarcodeDetector;
 import org.firstinspires.ftc.teamcode.ComputerVision.StartPosition;
 import org.firstinspires.ftc.teamcode.States.State;
 
-@Autonomous(name = "Red 1")
-@Disabled
+@Autonomous(name = "Blue 1")
+//@Disabled
 public class AutonomyBlue1 extends OpMode {
     private State state;
 
