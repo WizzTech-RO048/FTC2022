@@ -12,7 +12,7 @@ class StateRotate extends State {
 
 	StateRotate(@NonNull Robot robot, double degrees, @NonNull State previous) {
 		super(robot);
-		robot.wheels.rotateFor2(degrees, 0.2);
+		robot.wheels.rotateFor2(degrees, 0.4);
 		previousState = previous;
 	}
 
