@@ -60,7 +60,13 @@ public class MainTeleOp extends OpMode {
         double y = -gamepad1.right_stick_x;
         double r = -gamepad1.left_stick_y;
 
-
+		if(x >= 0.75){
+			x = 0.75;
+		} else if(y >= 0.75){
+			y = 0.75;
+		} else if(r >= 0.75){
+			r = 0.75;
+		}
 
         // enabling the boost
         boolean leftBumber = controller1.leftBumber();
