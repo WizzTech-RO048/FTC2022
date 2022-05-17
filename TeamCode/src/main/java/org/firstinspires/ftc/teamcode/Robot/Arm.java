@@ -42,7 +42,7 @@ public class Arm {
     public enum Position {
         BASE(0.1),
         MID(0.3),
-        TOP(0.7);
+        TOP(0.65);
 
         private final double position;
 
