@@ -40,4 +40,14 @@ public abstract class State {
     public static State initial(HardwareMap hardwareMap, Telemetry telemetry, @Nullable BarcodeDetector.Position mockPosition) {
         return new StateInitial(hardwareMap, telemetry, Executors.newScheduledThreadPool(1), mockPosition);
     }
+
+    // FIXME: doesn't work
+    public void waitForSeconds(double seconds){
+        int sec = (int) (seconds * 1000);
+        try{
+            Thread.sleep(sec);
+        } catch (InterruptedException e){
+            e.printStackTrace();
+        }
+    }
 }
