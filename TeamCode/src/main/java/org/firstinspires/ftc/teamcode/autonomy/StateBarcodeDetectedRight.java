@@ -7,6 +7,7 @@ import org.firstinspires.ftc.teamcode.Robot.Wheels;
 
 class StateBarcodeDetectedRight extends State {
 	private boolean hasMovedForward = false, hasMovedRight = false, hasRotatedInPosition = false, hasDroppedObject = false;
+	private State state;
 
 	StateBarcodeDetectedRight(@NonNull Robot robot) {
 		super(robot);
@@ -14,14 +15,25 @@ class StateBarcodeDetectedRight extends State {
 
 	@Override
 	public State update() {
+		// insert delay
+		// state.waitForSeconds(seconds);
+
+		// BLUE 1
+//		try {
+//			Thread.sleep(2);
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
+//
+//
 		if (!hasMovedForward) {
 			hasMovedForward = true;
-			return new StateMove(robot, 0.25, 0.3, Wheels.MoveDirection.BACKWARD, this);
+			return new StateMove(robot, 0.72, 0.3, Wheels.MoveDirection.BACKWARD, this);
 		}
 
-		if (!hasMovedRight) {
-			hasMovedRight = true;
-			return new StateMove(robot, 0.7, 0.4, Wheels.MoveDirection.LEFT, this);
+		if (!hasRotatedInPosition) {
+			hasRotatedInPosition = true;
+			return new StateRotate(robot, 90, this);
 		}
 
 		if (!hasDroppedObject) {
@@ -29,11 +41,56 @@ class StateBarcodeDetectedRight extends State {
 			return new StateDropObject(robot, Arm.Position.TOP, this);
 		}
 
-		if (!hasRotatedInPosition) {
-			hasRotatedInPosition = true;
-			return new StateRotate(robot, 170, this);
-		}
+		// RED 1
+
+//		if (!hasMovedForward) {
+//			hasMovedForward = true;
+//			return new StateMove(robot, 0.72, 0.3, Wheels.MoveDirection.BACKWARD, this);
+//		}
+//
+//		if (!hasRotatedInPosition) {
+//			hasRotatedInPosition = true;
+//			return new StateRotate(robot, 90, this);
+//		}
+//
+//		if (!hasDroppedObject) {
+//			hasDroppedObject = true;
+//			return new StateDropObject(robot, Arm.Position.TOP, this);
+//		}
+
 
 		return new StateActionCarousel(robot);
 	}
 }
+
+/*
+* BLUE 1
+*
+* 	try {
+			Thread.sleep(2);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+
+		if (!hasMovedForward) {
+			hasMovedForward = true;
+			return new StateMove(robot, 0.72, 0.3, Wheels.MoveDirection.BACKWARD, this);
+		}
+
+		if (!hasRotatedInPosition) {
+			hasRotatedInPosition = true;
+			return new StateRotate(robot, -90, this);
+		}
+
+		if (!hasDroppedObject) {
+			hasDroppedObject = true;
+			return new StateDropObject(robot, Arm.Position.TOP, this);
+	}
+* */
+
+/*
+* RED 1
+*
+*
+* */
