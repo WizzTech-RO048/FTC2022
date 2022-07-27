@@ -7,6 +7,8 @@ import org.firstinspires.ftc.teamcode.Robot.*;
 
 import java.util.concurrent.*;
 
+// TODO: smooth the way the robot moves in OpMode
+
 @TeleOp(name="MainTeleOp")
 public class MainTeleOp extends OpMode {
     private Robot robot;
