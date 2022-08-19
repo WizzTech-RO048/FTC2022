@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.*;
 import org.firstinspires.ftc.teamcode.ComputerVision.BarcodeDetector;
-import org.firstinspires.ftc.teamcode.autonomy.State;
+import org.firstinspires.ftc.teamcode.States.State;
 
 @Autonomous
 public class Autonomy extends OpMode {
