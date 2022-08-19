@@ -7,8 +7,6 @@ import org.firstinspires.ftc.teamcode.Robot.*;
 
 import java.util.concurrent.*;
 
-// TODO: smooth the way the robot moves in OpMode
-
 @TeleOp(name="MainTeleOp")
 public class MainTeleOp extends OpMode {
     private Robot robot;
@@ -23,6 +21,7 @@ public class MainTeleOp extends OpMode {
     private int rbPressed = 0;
     private int dpadLeftPressed = 0;
     private int dpadRightPressed = 0;
+    private double speed_limit = 0.75;
 
     boolean turbo = false;
 
@@ -58,26 +57,17 @@ public class MainTeleOp extends OpMode {
         controller1.update();
         controller2.update();
 
-        double x = -gamepad1.left_stick_x;
-        double y = -gamepad1.right_stick_x;
-        double r = -gamepad1.left_stick_y;
-
-		if(x >= 0.75){
-			x = 0.75;
-		} else if(y >= 0.75){
-			y = 0.75;
-		} else if(r >= 0.75){
-			r = 0.75;
-		}
-
-        // enabling the boost
-        boolean leftBumber = controller1.leftBumber();
-        if(leftBumber){
-            x = 1.0;
-            y = 1.0;
-            r = 1.0;
+        // ------ enabling the boost ------
+        if (controller1.leftBumber()) {
+            speed_limit = 1.0;
         }
 
+        // ------- reading the inputs from the joystick controllers ----
+        double x = -gamepad1.left_stick_x * speed_limit;
+        double y = -gamepad1.right_stick_x * speed_limit;
+        double r = -gamepad1.left_stick_y * speed_limit;
+
+        // ------- moving the robot ----------
         if (Utils.isDone(lastRotation)) {
             if (isZero(x) && isZero(y) && isZero(r)) {
                 robot.wheels.stop();
@@ -86,11 +76,11 @@ public class MainTeleOp extends OpMode {
             }
         }
 
-        // controlling the intake system
+        // ------- controlling the intake system ---------
         if (controller1.leftTrigger == 0.0) { robot.intake(controller1.rightTrigger); }
         if (controller1.rightTrigger == 0.0) { robot.intake(-controller1.leftTrigger); }
 
-        // controlling the duck servo
+        // -------- controlling the duck servo ----------
         if (controller1.dpadLeftOnce()) {
             dpadLeftPressed++;
             if (dpadLeftPressed % 2 == 0) {
@@ -109,14 +99,14 @@ public class MainTeleOp extends OpMode {
             }
         }
 
-        // controlling the arm
+        // ------------- controlling the arm ---------
         if (controller1.AOnce()) { targetPosition = 0.0; }
         if (controller1.XOnce()) { targetPosition = 0.1; }
         if (controller1.BOnce()) { targetPosition = 0.35; }
         if (controller1.YOnce()) { targetPosition = 0.7; }
         controlArm();
 
-        // rotating the arm servo motor
+        // -------- rotating the cage servo ------------
         if (controller1.rightBumberOnce()) {
             rbPressed++;
             if (rbPressed % 2 == 1) {
@@ -126,7 +116,7 @@ public class MainTeleOp extends OpMode {
             }
         }
 
-        // emergency stop button
+        // ------ emergency stop button
         if(controller1.startOnce()){ stop(); }
     }
 
