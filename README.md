@@ -6,7 +6,7 @@ This code was developed during the 2021-2022 FIRST Tech Challenge Freight Frenzy
 
 <img src="images/poza-grup16x9.png">
 
-# Programming
+## Programming
 
 The code was written in Java.
 
