@@ -8,6 +8,7 @@ import org.firstinspires.ftc.teamcode.States.State;
 public class Autonomy extends OpMode {
     private State state;
 
+
     @Override
     public void init() {
         state = State.initial(hardwareMap, telemetry, BarcodeDetector.Position.RIGHT);
