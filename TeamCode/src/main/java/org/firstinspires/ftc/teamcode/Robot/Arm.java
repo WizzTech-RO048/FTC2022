@@ -52,7 +52,7 @@ public class Arm {
     }
 
 
-    public ScheduledFuture<?> moveArm(double positionPercentage) {
+    public ScheduledFuture<?> moveArm(double positionPercentage, double raise_power) {
         if (!Utils.isDone(lastMove) && !lastMove.cancel(true)) {
             return null;
         }
@@ -66,19 +66,19 @@ public class Arm {
 
         arm.setTargetPosition(targetPosition);
         arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        arm.setPower(targetPosition > initialPosition ? 1 : -1);
+        arm.setPower(targetPosition > initialPosition ? raise_power : -raise_power);
 
         lastMove = Utils.poll(scheduler, () -> !arm.isBusy(), () -> arm.setPower(0), 10, TimeUnit.MILLISECONDS);
 
         return lastMove;
     }
 
-    public ScheduledFuture<?> raise(@Nullable Position position) {
+    public ScheduledFuture<?> raise(@Nullable Position position, double raise_power) {
         if (position != null) {
-            return moveArm(position.position);
+            return moveArm(position.position, raise_power);
         }
 
-        return moveArm(0);
+        return moveArm(0, raise_power);
     }
 
     public void stop() {
