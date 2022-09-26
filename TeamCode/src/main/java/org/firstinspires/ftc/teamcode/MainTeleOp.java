@@ -21,7 +21,9 @@ public class MainTeleOp extends OpMode {
     private int rbPressed = 0;
     private int dpadLeftPressed = 0;
     private int dpadRightPressed = 0;
-    private double speed_limit = 0.75;
+    private double speed_limit = 0.25;
+
+    private double RAISE_POWER = 0.5;
 
     boolean turbo = false;
 
@@ -57,9 +59,11 @@ public class MainTeleOp extends OpMode {
         controller1.update();
         controller2.update();
 
-        // ------ enabling the boost ------
-        if (controller1.leftBumber()) {
-            speed_limit = 1.0;
+        // ------ controlling the speed percentage of the movement ------
+        if (controller1.dpadUp() && speed_limit < 1.0 && speed_limit >= 0.0) {
+            speed_limit += 0.25;
+        } else if (controller1.dpadUp() && speed_limit <= 1.0 && speed_limit > 0.0) {
+            speed_limit -= 0.25;
         }
 
         // ------- reading the inputs from the joystick controllers ----
@@ -100,7 +104,10 @@ public class MainTeleOp extends OpMode {
         }
 
         // ------------- controlling the arm ---------
-        if (controller1.AOnce()) { targetPosition = 0.0; }
+        if (controller1.AOnce()) {
+            robot.arm.retract();
+            targetPosition = 0.0;
+        }
         if (controller1.XOnce()) { targetPosition = 0.1; }
         if (controller1.BOnce()) { targetPosition = 0.35; }
         if (controller1.YOnce()) { targetPosition = 0.7; }
@@ -129,16 +136,20 @@ public class MainTeleOp extends OpMode {
 
         if (controller1.AOnce()) {
             position = null;
-        } else if (controller1.XOnce()) {
+        }
+        else if (controller1.XOnce()) {
             position = Arm.Position.BASE;
-        } else if (controller1.BOnce()) {
+        }
+        else if (controller1.BOnce()) {
             position = Arm.Position.MID;
-        } else if (controller1.YOnce()) {
+        }
+        else if (controller1.YOnce()) {
             position = Arm.Position.TOP;
-        } else {
+        }
+        else {
             return;
         }
-        lastArmRaised = robot.arm.raise(position);
+        lastArmRaised = robot.arm.raise(position, RAISE_POWER);
     }
 
     private static boolean isZero(double value) {
