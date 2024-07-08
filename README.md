@@ -6,6 +6,8 @@ This code was developed during the 2021-2022 FIRST Tech Challenge Freight Frenzy
 
 <img src="images/poza-grup16x9.png">
 
+You can take a look at ours team notebook for this season right here: [WizzTech's Team Notebook](https://drive.google.com/file/d/1prgW-KJX31VKSASJfa112QSmGd3WIRzn/view?usp=sharing)
+
 ## Programming
 
 The code was written in Java.
@@ -32,6 +34,6 @@ Many thanks to our sponsors ! We are always grateful for having such amazing peo
 
 ![Tema picture from the 2021-2022 remote regionals](images/team-photo-regionals.jpeg)
 
-<center style="font-style: italic;"> Created with love and passion 💜 </center>
-<center style="font-style: italic;"> Timisoara, Romania </center>
-<center style="font-style: italic;"> sept 2021 - aug2022 </center>
+<center style="font-style: italic;"> Created with love and passion 💜 </center> <br>
+<center style="font-style: italic;"> Timisoara, Romania </center> <br>
+<center style="font-style: italic;"> sept 2021 - aug2022 </center> <br>
