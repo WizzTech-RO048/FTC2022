@@ -1,6 +1,6 @@
-<img src="images/natie-prin-educatie-logo.png" style="width: 600px">
-
 # WizzTech 2021-2022 - Freight Frenzy
+
+<img src="images/wizztech-logo-text-2023-2024.png" style="width: 600px">
 
 This code was developed during the 2021-2022 FIRST Tech Challenge Freight Frenzy by the 19094 WizzTech Robotics team.
 
